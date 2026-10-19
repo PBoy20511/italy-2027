@@ -380,7 +380,7 @@ const VIEWS={
  ro:{b:[[41.915,12.452],[41.886,12.505]]}
 };
 function initMap(){
-  map=L.map('map',{zoomControl:true,tap:true});
+  map=L.map('map',{zoomControl:true,tap:true,scrollWheelZoom:false});
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
   layer=L.layerGroup().addTo(map);
@@ -438,7 +438,7 @@ function dayCard(i,compact){
     ${S[id].b!=='free'?`<span class="badge ${BADGE[S[id].b][1]}" style="font-size:10px;padding:1px 6px">${BADGE[S[id].b][0]}</span>`:''}</div>
     ${note?`<div class="note">${esc(note)}</div>`:''}</li>`).join('');
   const gm='https://www.google.com/maps/dir/'+x.s.map(([id])=>S[id].ll.join(',')).join('/');
-  return `<div class="card day" id="day${i}" style="--c:${col}">
+  return `<div class="card day"${compact?'':` id="day${i}"`} style="--c:${col}">
     <div class="dh"><span class="dn">DAY ${i+1}・${CITY[x.c]}</span><span class="dt">${x.d}（${x.w}）</span><span class="theme">${esc(x.t)}</span></div>
     <ul class="tl">${items}</ul>
     ${x.warn?`<div class="warn">⚠ ${esc(x.warn)}</div>`:''}
