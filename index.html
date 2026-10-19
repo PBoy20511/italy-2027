@@ -381,8 +381,8 @@ const VIEWS={
 };
 function initMap(){
   map=L.map('map',{zoomControl:true,tap:true});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-    maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
   layer=L.layerGroup().addTo(map);
   const cc=$('#cityChips');
   [['all','🇮🇹 全程'],['ve','威尼斯'],['fi','佛羅倫斯'],['ro','羅馬']].forEach(([k,l])=>{
