@@ -242,6 +242,8 @@ const S={
  scroce:{n:'聖十字教堂',it:'Basilica di Santa Croce',c:'fi',ll:[43.76860,11.26220],b:'free',d:'米開朗基羅、伽利略、但丁紀念墓都在這。現場買票即可。',price:'約 €10'},
  smnch:{n:'新聖母教堂＋古老藥局',it:'Santa Maria Novella / Officina Profumo',c:'fi',ll:[43.77460,11.24930],b:'free',d:'教堂門票現場買；旁邊的「新聖母藥局」是 1612 年的香水藥妝老店，免費參觀，買伴手禮。'},
  siena:{n:'西恩納（一日遊）',it:'Siena – Piazza del Campo',c:'tr',ll:[43.31830,11.33170],b:'free',d:'從佛羅倫斯 Autostazione 搭 Autolinee Toscane 快速巴士約 1h15（直達市區，比火車方便）。扇形廣場、西恩納大教堂（地板鑲嵌）。網友：「冬天的西恩納超棒、人超少」。',close:'小鎮餐廳冬天部分休息'},
+ sangim:{n:'聖吉米尼亞諾',it:'San Gimignano',c:'tr',ll:[43.46770,11.04320],b:'free',mine:1,d:'「中世紀曼哈頓」：山城裡留著十幾座石塔。Gelateria Dondoli 冰淇淋拿過世界冠軍。托斯卡尼一日遊團幾乎都會停。'},
+ chianti:{n:'奇揚第酒區',it:'Chianti（Greve in Chianti 一帶）',c:'tr',ll:[43.58380,11.31680],b:'rec',mine:1,d:'佛羅倫斯和西恩納之間的葡萄酒產區，丘陵加柏樹的托斯卡尼經典風景。一日遊團通常含酒莊品酒＋午餐。冬天葡萄園光禿禿的，但酒莊室內照樣能品酒。'},
  pisa:{n:'比薩斜塔（一日遊替代）',it:'Pisa – Torre pendente',c:'tr',ll:[43.72300,10.39660],b:'must',d:'火車約 1 小時。廣場免費；<b>登塔必須預約時段</b>。可順遊盧卡 Lucca 城牆。',price:'登塔約 €20',url:'https://www.opapisa.it/en/'},
  // 羅馬
  suite69:{n:'69 Suite Boutique（飯店）',it:'Via Nazionale 69',c:'ro',ll:[41.89928,12.49122],hotel:1,b:'free',d:'羅馬住的飯店，Monti 區，走路約 10 分鐘到 Termini 車站、15 分鐘到許願池。'},
@@ -306,9 +308,10 @@ const D=[
  {d:'2/4',w:'四',c:'fi',t:'大教堂建築群・大衛像',s:[
    ['duomo','08:30','爬圓頂（預約時段）'],['giotto','10:30','爬鐘樓'],['mcentrale','12:30','午餐'],
    ['accad','14:00','大衛像'],['smnch','16:30','古老藥局買伴手禮'],['zaza','19:30','大牛排（先訂位）']]},
- {d:'2/5',w:'五',c:'tr',t:'一日遊：西恩納（或比薩）',s:[
-   ['siena','08:30','巴士約 1h15'],['pisa','—','替代方案：比薩＋盧卡']],
-  warn:'二選一。西恩納比較符合你們「人少、在地」的口味；比薩登塔要預約。'},
+ {d:'2/5',w:'五',c:'tr',t:'托斯卡尼一日遊（KKday 團）',s:[
+   ['smn','~08:00','集合（地點以訂單憑證為準）',1],['siena','上午','常見行程：西恩納'],
+   ['sangim','中午','聖吉米尼亞諾'],['chianti','下午','奇揚第酒莊品酒'],['spadai','~19:00','回佛羅倫斯',1]],
+  warn:'站點以你訂的團為準。冬天日照短、部分酒莊休息，訂前確認 2/5 有出團、含哪些點、取消規則。'},
  {d:'2/6',w:'六',c:'fi',t:'碧提宮・Oltrarno・除夕',s:[
    ['pitti','09:00','碧提宮＋波波里花園'],['pvecchio','13:00',''],['mcentrale','15:00','皮件市集'],['michel','17:00','沒看夠可再去一次']],
   warn:'今天是農曆除夕 🧧'},
@@ -403,7 +406,7 @@ function drawCity(k){
     const pts=[['uvis','威尼斯 1/29–2/2'],['spadai','佛羅倫斯 2/2–2/7'],['suite69','羅馬 2/7–2/14']];
     L.polyline(pts.map(p=>S[p[0]].ll),{color:'#555',weight:3,dashArray:'6 6'}).addTo(layer);
     pts.forEach(([id,l],i)=>L.marker(S[id].ll,{icon:pin(C[S[id].c],i+1,1)}).bindPopup(popup(id,l)).addTo(layer));
-    ['siena','pisa','tivoli'].forEach(id=>L.marker(S[id].ll,{icon:pin(C.tr,'★')}).bindPopup(popup(id,'一日遊選項')).addTo(layer));
+    ['siena','sangim','chianti','pisa','tivoli'].forEach(id=>L.marker(S[id].ll,{icon:pin(C.tr,'★')}).bindPopup(popup(id,'一日遊選項')).addTo(layer));
     L.marker(S.vce.ll,{icon:pin('#333','✈')}).bindPopup(popup('vce','1/29 抵達')).addTo(layer);
     L.marker(S.fco.ll,{icon:pin('#333','✈')}).bindPopup(popup('fco','2/14 離開')).addTo(layer);
     $('#mapDay').innerHTML=`<div class="card small">🚄 威尼斯 →（2h15）→ 佛羅倫斯 →（1h40）→ 羅馬。點城市看該城所有景點，點日期看當天路線。</div>`;
@@ -508,7 +511,7 @@ const BOOK=[
   ['zaza','Trattoria Zà Zà 晚餐（2/4）','打電話或網站訂位'],
   ['pantheon','萬神殿（2/10）','可現場，週末建議線上'],
   ['pitti','碧提宮＋波波里（2/6）',''],
-  ['siena','2/5 一日遊決定：西恩納 or 比薩','比薩登塔要預約']]},
+  ['chianti','KKday 托斯卡尼一日遊（2/5）','確認：2 月有出團、集合點、含哪些小鎮／酒莊、午餐、取消規則']]},
  {g:'🚆 交通',items:[
   ['smn','威尼斯 → 佛羅倫斯 2/2 13:05','Trenitalia／Italo，早買便宜'],
   ['termini','佛羅倫斯 → 羅馬 2/7 13:43',''],
