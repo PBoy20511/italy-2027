@@ -4,146 +4,158 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#0f5c4d">
+<meta name="theme-color" content="#f8f4e3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 <title>大寶小寶義大利</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
-  --bg:#f6f3ee;--card:#fff;--ink:#1f2328;--sub:#5d646c;--line:#e4ded4;
-  --brand:#0f5c4d;--brand2:#e8f3ef;
-  --ve:#1f6fb2;--fi:#c0572b;--ro:#a8326e;--tr:#6b6f76;
-  --must:#c62828;--rec:#e08a00;--free:#2e7d32;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.05);
+  color-scheme:light;
+  --bg:#f8f4e3;--card:#fffdf3;--ink:#5b4a3a;--sub:#a08c6a;--line:#ece2c6;
+  --brand:#3fb5a0;--brand-d:#2f8f80;--brand2:#dff4ee;
+  --gold:#e2c27a;--gold-d:#c9a24f;--sun:#f5c84c;--sun-d:#d9a92b;--coral:#ff8c7a;--pinkbg:#ffe1e8;
+  --ve:#4aa8d8;--fi:#f0905d;--ro:#e46b8f;--tr:#8bc96b;
+  --must:#ff7a66;--rec:#f2b33d;--free:#6cc3a0;
+  --shadow:0 4px 0 #e6dcbf;
+  --serif:"Noto Serif TC",serif;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#15171a;--card:#1f2226;--ink:#eceff2;--sub:#a3abb4;--line:#30353b;
-  --brand:#5cc4a8;--brand2:#1d3330;--shadow:none;
-}}
-:root[data-theme="dark"]{--bg:#15171a;--card:#1f2226;--ink:#eceff2;--sub:#a3abb4;--line:#30353b;--brand:#5cc4a8;--brand2:#1d3330;--shadow:none}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;-webkit-text-size-adjust:100%}
-a{color:var(--brand)}
-header{background:var(--brand);color:#fff;padding:14px 16px 10px;padding-top:max(14px,env(safe-area-inset-top))}
-:root[data-theme="dark"] header{color:#10201c}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header{color:#10201c}}
-header h1{margin:0;font-size:20px;letter-spacing:.5px}
-header .meta{font-size:13px;opacity:.9}
-#today{margin-top:8px;background:rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;font-size:14px;display:none}
-nav{position:sticky;top:0;z-index:1000;background:var(--card);border-bottom:1px solid var(--line);display:flex;overflow-x:auto;scrollbar-width:none}
-nav::-webkit-scrollbar{display:none}
-nav button{flex:1 0 auto;border:0;background:none;color:var(--sub);font:inherit;font-size:14px;padding:11px 12px;border-bottom:3px solid transparent;white-space:nowrap}
-nav button.on{color:var(--brand);border-color:var(--brand);font-weight:600}
-main{max-width:760px;margin:0 auto;padding:12px 16px 80px}
+html,body{margin:0;color:var(--ink);font:15px/1.6 "Zen Maru Gothic","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;-webkit-text-size-adjust:100%}
+body{background:var(--bg) radial-gradient(circle at 14px 14px,#efe7cc 2.5px,transparent 3.5px) 0 0/28px 28px}
+a{color:var(--brand-d)}
+/* ---- header: Genshin quest banner in ACNH colours ---- */
+header{padding:14px 16px 6px;padding-top:max(14px,env(safe-area-inset-top))}
+.banner{display:flex;gap:12px;align-items:center;background:var(--card);border:2px solid var(--gold);border-radius:26px;padding:10px 14px 10px 10px;box-shadow:var(--shadow);position:relative}
+.banner:before,.banner:after{content:"";position:absolute;width:10px;height:10px;background:var(--gold);transform:rotate(45deg);top:50%;margin-top:-5px}
+.banner:before{left:-6px}.banner:after{right:-6px}
+.emblem{flex:0 0 auto;width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,#fff 0 30%,var(--brand) 31% 62%,var(--card) 63%);border:3px solid var(--gold);display:grid;place-items:center;font-size:20px;box-shadow:0 3px 0 #e6dcbf}
+header .kick{font-size:11px;font-weight:900;color:var(--brand);letter-spacing:1px}
+header h1{margin:0;font:900 20px/1.25 var(--serif);letter-spacing:.5px}
+header .meta{font-size:12px;color:var(--sub)}
+#today{margin-top:10px;background:var(--sun);color:var(--ink);border-radius:18px;padding:7px 14px;font-size:14px;font-weight:700;display:none;box-shadow:0 3px 0 var(--sun-d)}
+/* ---- bottom tab bar ---- */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:var(--card);border-radius:22px 22px 0 0;box-shadow:0 -3px 0 #e6dcbf,0 -6px 18px rgba(120,100,60,.12);display:flex;padding:6px 4px max(6px,env(safe-area-inset-bottom))}
+nav button{flex:1 1 0;min-width:0;border:0;background:none;color:var(--sub);font:inherit;font-size:10.5px;font-weight:700;padding:2px 0;display:flex;flex-direction:column;align-items:center;gap:1px;white-space:nowrap}
+nav button i{font-style:normal;font-size:19px;line-height:28px;width:42px;border-radius:14px}
+nav button.on{color:var(--brand-d)}
+nav button.on i{background:var(--brand);box-shadow:0 3px 0 var(--brand-d)}
+main{max-width:760px;margin:0 auto;padding:6px 16px 110px}
 section{display:none}section.on{display:block}
-h2{font-size:18px;margin:18px 0 8px}h3{font-size:16px;margin:14px 0 6px}
-.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--line);padding:12px 14px;margin:10px 0}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+/* ---- headings: Genshin diamond + gold rule ---- */
+h2{font:900 18px var(--serif);margin:20px 0 8px;display:flex;align-items:center;gap:8px}
+h2:before{content:"";width:11px;height:11px;background:var(--gold);transform:rotate(45deg);flex:0 0 auto;box-shadow:0 0 0 3px #fff6dc}
+h2:after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--gold),transparent);border-radius:2px}
+h3{font-size:15px;font-weight:900;margin:14px 0 6px}
+.chapter{margin:22px 0 4px;text-align:center;font:900 15px var(--serif);color:var(--gold-d);display:flex;align-items:center;gap:10px}
+.chapter:before,.chapter:after{content:"";flex:1;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.chapter span{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:3px 14px;box-shadow:0 3px 0 #e6dcbf}
+/* ---- cards ---- */
+.card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);border:2px solid var(--line);padding:12px 14px;margin:12px 0}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px}
-.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
-:root[data-theme="dark"] .chip.on{color:#10201c}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.on{color:#10201c}}
-#map{height:58vh;min-height:320px;border-radius:14px;border:1px solid var(--line);z-index:1}
-.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--sub);margin:6px 2px}
+.chip{flex:0 0 auto;border:0;background:var(--card);color:var(--ink);border-radius:999px;padding:6px 13px;font:inherit;font-size:13px;font-weight:700;box-shadow:0 3px 0 #e6dcbf}
+.chip.on{background:var(--sun);box-shadow:0 3px 0 var(--sun-d)}
+#map{height:56vh;min-height:320px;border-radius:26px;border:5px solid var(--card);box-shadow:0 0 0 2px var(--gold),var(--shadow);z-index:1}
+#map .leaflet-tile-pane{filter:saturate(1.45) brightness(1.06) hue-rotate(-10deg) contrast(.92)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--sub);margin:8px 4px}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
-.pin{width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
-.pin span{transform:rotate(45deg);color:#fff;font:700 12px/1 sans-serif}
-.pin.hotel{border-radius:6px;transform:none}.pin.hotel span{transform:none}
-.leaflet-popup-content{font:14px/1.45 -apple-system,"PingFang TC","Noto Sans TC",sans-serif;margin:10px 12px}
+/* ---- waypoint pins ---- */
+.pin{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,var(--pc) 0 52%,#fff 53% 64%,var(--pc) 65%);border:2.5px solid var(--gold-d);box-shadow:0 3px 0 rgba(90,70,40,.35);display:grid;place-items:center}
+.pin span{color:#fff;font:900 12px/1 "Zen Maru Gothic",sans-serif;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.pin.hotel{border-radius:10px;background:var(--sun);border-color:var(--sun-d)}
+.pin.hotel span{color:var(--ink);text-shadow:none}
+.leaflet-popup-content-wrapper{border-radius:20px;background:var(--card);border:2px solid var(--gold);box-shadow:0 4px 0 #e6dcbf}
+.leaflet-popup-tip{background:var(--card)}
+.leaflet-popup-content{font:14px/1.5 "Zen Maru Gothic","Noto Sans TC",sans-serif;color:var(--ink);margin:10px 12px}
 .leaflet-popup-content b{font-size:15px}
-/* overview strip */
-.strip{display:flex;border-radius:12px;overflow:hidden;margin:8px 0;font-size:12px;color:#fff;text-align:center}
-.strip div{padding:8px 2px;line-height:1.3}
+/* ---- city strip & calendar ---- */
+.strip{display:flex;gap:6px;margin:6px 0 10px;font-size:12px;color:#fff;text-align:center}
+.strip div{padding:7px 2px;line-height:1.3;border-radius:16px;box-shadow:0 3px 0 rgba(0,0,0,.12)}
 .strip b{display:block;font-size:14px}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:12px}
-.cal .h{color:var(--sub);text-align:center}
-.cal .d{border-radius:8px;padding:5px 2px;text-align:center;color:#fff;min-height:44px;cursor:pointer}
-.cal .d small{display:block;opacity:.9;font-size:10px;line-height:1.2}
-.cal .x{background:transparent}
-/* day timeline */
-.day{border-left:5px solid var(--c);}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;font-size:12px}
+.cal .h{color:var(--sub);text-align:center;font-weight:700}
+.cal .d{border-radius:12px;padding:5px 2px;text-align:center;color:#fff;min-height:46px;cursor:pointer;font-weight:900;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.cal .d small{display:block;font-size:10px;line-height:1.2;font-weight:500}
+.cal .x{background:transparent;box-shadow:none}
+/* ---- day quest cards ---- */
+.day{border-color:var(--line);position:relative;overflow:hidden}
+.day:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c)}
 .day .dh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.day .dn{font-weight:700;color:var(--c);font-size:13px}
-.day .dt{font-weight:700;font-size:16px}
-.day .theme{color:var(--sub);font-size:13px;width:100%}
+.day .dn{font-weight:900;color:#fff;background:var(--c);font-size:11px;border-radius:10px;padding:1px 9px}
+.day .dt{font:900 17px var(--serif)}
+.day .theme{color:var(--sub);font-size:13px;width:100%;font-weight:700}
+.stars{color:#f2b33d;letter-spacing:1px;font-size:13px}
 .tl{list-style:none;margin:10px 0 4px;padding:0;position:relative}
-.tl:before{content:"";position:absolute;left:13px;top:6px;bottom:6px;width:2px;background:var(--line)}
-.tl li{position:relative;padding:0 0 10px 36px}
-.tl li .n{position:absolute;left:2px;top:0;width:24px;height:24px;border-radius:50%;background:var(--c);color:#fff;font:700 12px/24px sans-serif;text-align:center}
-.tl li .n.t{background:var(--tr)}
-.tl li .tm{font-size:12px;color:var(--sub)}
-.tl li .w{font-weight:600}
+.tl:before{content:"";position:absolute;left:13px;top:8px;bottom:8px;border-left:3px dotted var(--gold)}
+.tl li{position:relative;padding:0 0 12px 38px;min-height:46px}
+.tl li .n{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle,var(--c) 0 55%,#fff 56% 66%,var(--c) 67%);border:2px solid var(--gold-d);color:#fff;font:900 12px/24px "Zen Maru Gothic",sans-serif;text-align:center}
+.tl li .n.t{background:var(--card);border-color:var(--line);color:var(--ink);line-height:24px}
+.tl li .tm{font-size:12px;color:var(--sub);font-weight:700}
+.tl li .w{font-weight:900}
 .tl li .note{font-size:13px;color:var(--sub)}
-.warn{background:#fff4e0;color:#7a4b00;border-radius:8px;padding:6px 9px;font-size:13px;margin-top:6px}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .warn{background:#3a2c12;color:#ffd58a}}
-:root[data-theme="dark"] .warn{background:#3a2c12;color:#ffd58a}
-.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.btn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-size:13px;text-decoration:none;color:var(--ink);background:var(--bg)}
-.btn.p{background:var(--brand);border-color:var(--brand);color:#fff}
-:root[data-theme="dark"] .btn.p{color:#10201c}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.p{color:#10201c}}
-/* spots */
+.tl li .th{float:right;width:58px;height:44px;object-fit:cover;border-radius:14px;margin-left:8px;background:var(--line);border:2px solid #fff;box-shadow:0 2px 0 #e6dcbf}
+.warn{background:#fff4c9;color:#7a5a17;border-radius:14px;padding:7px 11px;font-size:13px;margin-top:8px;font-weight:500}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{display:inline-flex;align-items:center;gap:4px;border:2px solid var(--line);border-radius:18px;padding:6px 13px;font-size:13px;font-weight:700;text-decoration:none;color:var(--ink);background:var(--card);box-shadow:0 3px 0 #e6dcbf}
+.btn.p{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 3px 0 var(--brand-d)}
+/* ---- spots ---- */
 .spot .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-.spot .nm{font-weight:700;font-size:16px}
+.spot .nm{font:900 18px var(--serif)}
 .spot .it{font-size:12px;color:var(--sub)}
-.badge{flex:0 0 auto;font-size:12px;border-radius:999px;padding:3px 9px;color:#fff;font-weight:600}
+.badge{flex:0 0 auto;font-size:12px;border-radius:999px;padding:3px 10px;color:#fff;font-weight:900}
 .b-must{background:var(--must)}.b-rec{background:var(--rec)}.b-free{background:var(--free)}
 .tags{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}
-.tag{font-size:11px;border-radius:6px;padding:2px 7px;background:var(--brand2);color:var(--brand)}
-.tag.mine{background:#fde7ef;color:#a8326e}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.mine{background:#3b1f2b;color:#f59ac2}}
-:root[data-theme="dark"] .tag.mine{background:#3b1f2b;color:#f59ac2}
-.kv{display:grid;grid-template-columns:4.5em 1fr;gap:2px 8px;font-size:13px;margin-top:6px}
-.kv dt{color:var(--sub)}.kv dd{margin:0}
-details{border-top:1px dashed var(--line);margin-top:8px;padding-top:6px}
-summary{cursor:pointer;color:var(--brand);font-size:13px}
-#q{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tag{font-size:11px;font-weight:700;border-radius:10px;padding:2px 8px;background:var(--brand2);color:var(--brand-d)}
+.tag.mine{background:var(--pinkbg);color:#c2577a}
+.kv{display:grid;grid-template-columns:4.5em 1fr;gap:3px 8px;font-size:13px;margin-top:8px;padding:8px 10px;background:var(--bg);border-radius:14px}
+.kv dt{color:var(--sub);font-weight:700}.kv dd{margin:0}
+#q{width:100%;font:inherit;font-size:16px;padding:11px 16px;border-radius:22px;border:2px solid var(--gold);background:var(--card);color:var(--ink);box-shadow:var(--shadow);outline:none}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:left;vertical-align:top}
-th{color:var(--sub);font-weight:600}
-.ck{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line)}
-.ck input{width:20px;height:20px;margin-top:2px;accent-color:var(--brand)}
+th,td{border-bottom:2px dotted var(--line);padding:7px 4px;text-align:left;vertical-align:top}
+th{color:var(--sub);font-weight:700}
+.ck{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:2px dotted var(--line)}
+.ck input{width:22px;height:22px;margin-top:1px;accent-color:var(--brand)}
 .ck.done .t{text-decoration:line-through;color:var(--sub)}
 .small{font-size:12px;color:var(--sub)}
-.hotel h3{margin:0 0 4px}
+.hotel h3{margin:0 0 4px;font:900 17px var(--serif)}
 .flight{display:flex;align-items:center;gap:8px;font-size:13px}
-.flight .ap{font-weight:700;font-size:16px}
-.flight .ln{flex:1;border-top:2px dashed var(--line);position:relative;text-align:center}
-.flight .ln span{position:relative;top:-10px;background:var(--card);padding:0 4px;color:var(--sub);font-size:11px}
-.fab{position:fixed;right:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:1100;background:var(--brand);color:#fff;border:0;border-radius:999px;padding:11px 15px;font:600 14px sans-serif;box-shadow:0 3px 12px rgba(0,0,0,.25)}
-:root[data-theme="dark"] .fab{color:#10201c}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fab{color:#10201c}}
+.flight .ap{font-weight:900;font-size:16px;background:var(--brand2);color:var(--brand-d);border-radius:10px;padding:2px 8px}
+.flight .ln{flex:1;border-top:3px dotted var(--gold);position:relative;text-align:center}
+.flight .ln span{position:relative;top:-11px;background:var(--card);padding:0 4px;color:var(--sub);font-size:11px;font-weight:700}
+.fab{position:fixed;right:14px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:1100;background:var(--sun);color:var(--ink);border:2px solid #fff;border-radius:999px;padding:9px 15px;font:900 14px "Zen Maru Gothic",sans-serif;box-shadow:0 4px 0 var(--sun-d),0 6px 14px rgba(0,0,0,.15)}
 .empty{color:var(--sub);text-align:center;padding:20px}
-.ph{margin:-12px -14px 10px;border-radius:14px 14px 0 0;overflow:hidden;position:relative;background:var(--line);aspect-ratio:16/9}
+.ph{margin:-12px -14px 10px;border-radius:20px 20px 0 0;overflow:hidden;position:relative;background:var(--line);aspect-ratio:16/9;border-bottom:3px solid var(--gold)}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
-.ph .cr{position:absolute;right:6px;bottom:4px;font-size:10px;color:#fff;background:rgba(0,0,0,.45);padding:1px 6px;border-radius:6px;text-decoration:none}
-.ph .cp{position:absolute;left:6px;bottom:4px;font-size:11px;color:#fff;background:rgba(0,0,0,.5);padding:1px 7px;border-radius:6px}
-.tl li .th{float:right;width:56px;height:42px;object-fit:cover;border-radius:7px;margin-left:8px;background:var(--line)}
-.pop-img{width:100%;height:110px;object-fit:cover;border-radius:8px;margin:2px 0 6px;display:block}
-.night{border-left:5px solid #2b3a8c}
-.night .tl li .n{background:#2b3a8c}
-.zone{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ph .cr{position:absolute;right:8px;bottom:6px;font-size:10px;color:#fff;background:rgba(0,0,0,.4);padding:1px 7px;border-radius:8px;text-decoration:none}
+.ph .cp{position:absolute;left:8px;bottom:6px;font-size:11px;color:var(--ink);background:var(--sun);padding:1px 9px;border-radius:10px;font-weight:700}
+.pop-img{width:100%;height:110px;object-fit:cover;border-radius:14px;margin:2px 0 6px;display:block}
+.night{--c:#7b86d6}
+.night .tl li .n{background:radial-gradient(circle,#7b86d6 0 55%,#fff 56% 66%,#7b86d6 67%)}
+.zone{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:2px dotted var(--line);font-size:14px}
 .zone:last-child{border:0}
-.lv{flex:0 0 auto;font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;color:#fff}
-.lv.g{background:#2e7d32}.lv.y{background:#e08a00}.lv.r{background:#c62828}
-.clock{display:grid;grid-template-columns:repeat(6,1fr);border-radius:10px;overflow:hidden;font-size:11px;text-align:center;color:#fff;margin:8px 0}
-.clock div{padding:6px 0}
+.lv{flex:0 0 auto;font-size:11px;font-weight:900;border-radius:10px;padding:2px 8px;color:#fff}
+.lv.g{background:#6cc3a0}.lv.y{background:#f2b33d}.lv.r{background:#ff7a66}
+.clock{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;font-size:11px;text-align:center;color:#fff;margin:8px 0;font-weight:700}
+.clock div{padding:6px 0;border-radius:10px}
 </style>
 </head>
 <body>
 <header>
-  <h1>🇮🇹 大寶小寶義大利 2027</h1>
-  <div class="meta">1/29（五）– 2/15（一）・威尼斯 4 晚 → 佛羅倫斯 5 晚 → 羅馬 7 晚</div>
+  <div class="banner"><div class="emblem">🇮🇹</div><div>
+    <div class="kick">大寶小寶的冒險・2027</div>
+    <h1>義大利之旅</h1>
+    <div class="meta">1/29 – 2/15・威尼斯 → 佛羅倫斯 → 羅馬</div></div></div>
   <div id="today"></div>
 </header>
 <nav id="tabs">
-  <button data-t="map" class="on">🗺️ 地圖</button>
-  <button data-t="plan">📅 行程</button>
-  <button data-t="night">🌙 夜遊</button>
-  <button data-t="spots">📍 景點</button>
-  <button data-t="book">🎟️ 預約</button>
-  <button data-t="stay">🏨 住宿交通</button>
-  <button data-t="tips">💡 實用</button>
+  <button data-t="map" class="on"><i>🗺️</i>地圖</button>
+  <button data-t="plan"><i>📖</i>任務</button>
+  <button data-t="night"><i>🌙</i>夜遊</button>
+  <button data-t="spots"><i>📷</i>景點</button>
+  <button data-t="book"><i>🎫</i>預約</button>
+  <button data-t="stay"><i>🏨</i>住宿</button>
+  <button data-t="tips"><i>💡</i>實用</button>
 </nav>
 <main>
 
@@ -221,7 +233,7 @@ th{color:var(--sub);font-weight:600}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-const C={ve:'#1f6fb2',fi:'#c0572b',ro:'#a8326e',tr:'#6b6f76'};
+const C={ve:'#4aa8d8',fi:'#f0905d',ro:'#e46b8f',tr:'#8bc96b'};
 const CITY={ve:'威尼斯',fi:'佛羅倫斯',ro:'羅馬',tr:'近郊'};
 const gmap=(q)=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
 const gdir=(ll)=>'https://www.google.com/maps/dir/?api=1&destination='+ll[0]+','+ll[1];
@@ -431,7 +443,7 @@ function renderNight(){
       <div class="btnrow"><a class="btn p" href="#" onclick="show('map');drawNight(${i});return false">🗺️ 看路線</a>
       <a class="btn" target="_blank" href="https://www.google.com/maps/dir/${x.s.map(([id])=>S[id].ll.join(',')).join('/')}/data=!4m2!4m1!3e2">Google 步行路線</a></div></div>`;
   }).join('');
-  const clock=`<div class="clock"><div style="background:#2e7d32">17:30<br>天黑</div><div style="background:#2e7d32">19:00</div><div style="background:#2e7d32">21:00</div><div style="background:#2e7d32">22:00</div><div style="background:#e08a00">23:00<br>回飯店</div><div style="background:#c62828">00:00 後<br>計程車</div></div>`;
+  const clock=`<div class="clock"><div style="background:#6cc3a0">17:30<br>天黑</div><div style="background:#6cc3a0">19:00</div><div style="background:#6cc3a0">21:00</div><div style="background:#6cc3a0">22:00</div><div style="background:#f2b33d">23:00<br>回飯店</div><div style="background:#ff7a66">00:00 後<br>計程車</div></div>`;
   $('#safety').innerHTML=`<div class="card">${clock}
    <div><b>結論：三個城市的景點區，晚上 23:00 前回到飯店都很安心。</b>23:00–24:00 大路上還有人，但巷子開始變空；過了午夜就搭計程車，別走路。</div>
    <div class="small" style="margin-top:6px">這是整理網路旅遊指南、論壇的共識，不是官方統計。Numbeo 的數字也是：羅馬白天走路安全感約 75 分，晚上約 47 分，差別主要在扒手和車站周邊。</div></div>`+
@@ -449,8 +461,8 @@ function renderNight(){
 function drawNight(i){
   layer.clearLayers();setChips('',-1);
   const x=N[i];const route=x.s.map(([id])=>S[id].ll);
-  L.polyline(route,{color:'#2b3a8c',weight:5,opacity:.85,dashArray:'2 8',lineCap:'round'}).addTo(layer);
-  x.s.forEach(([id,tm,note],j)=>L.marker(S[id].ll,{icon:pin('#2b3a8c',j+1,S[id].hotel),zIndexOffset:1000-j}).bindPopup(popup(id,`<b>${esc(tm)}</b> ${esc(note||'')}`)).addTo(layer));
+  L.polyline(route,{color:'#fff',weight:9,opacity:.8}).addTo(layer);L.polyline(route,{color:'#7b86d6',weight:4,dashArray:'1 9',lineCap:'round'}).addTo(layer);
+  x.s.forEach(([id,tm,note],j)=>L.marker(S[id].ll,{icon:pin('#7b86d6',j+1,S[id].hotel),zIndexOffset:1000-j}).bindPopup(popup(id,`<b>${esc(tm)}</b> ${esc(note||'')}`)).addTo(layer));
   const z=ZONES[x.c];
   map.fitBounds(L.latLngBounds(route).pad(0.2),{maxZoom:16});
   $('#mapDay').innerHTML=`<div class="card small">🌙 ${D[x.day].d} 夜遊：${esc(x.t)}。${z?z.note:''} <a href="#" onclick="show('night');return false">看安全區域</a></div>`;
@@ -478,8 +490,8 @@ $('#tabs').onclick=e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)
 /* ---------- map ---------- */
 let map,layer;
 function pin(color,label,hotel){
-  return L.divIcon({className:'',iconSize:[28,28],iconAnchor:hotel?[14,14]:[14,28],popupAnchor:[0,-24],
-    html:`<div class="pin${hotel?' hotel':''}" style="background:${color}"><span>${label}</span></div>`});
+  return L.divIcon({className:'',iconSize:[30,30],iconAnchor:[15,15],popupAnchor:[0,-14],
+    html:`<div class="pin${hotel?' hotel':''}" style="--pc:${color}"><span>${label}</span></div>`});
 }
 function popup(id,extra){
   const s=S[id];const b=BADGE[s.b];
@@ -517,11 +529,11 @@ function drawCity(k){
   layer.clearLayers();setChips(k,-1);$('#mapDay').innerHTML='';
   if(k==='all'){
     const pts=[['uvis','威尼斯 1/29–2/2'],['spadai','佛羅倫斯 2/2–2/7'],['suite69','羅馬 2/7–2/14']];
-    L.polyline(pts.map(p=>S[p[0]].ll),{color:'#555',weight:3,dashArray:'6 6'}).addTo(layer);
+    L.polyline(pts.map(p=>S[p[0]].ll),{color:'#fff',weight:8,opacity:.8}).addTo(layer);L.polyline(pts.map(p=>S[p[0]].ll),{color:'#c9a24f',weight:4,dashArray:'8 8'}).addTo(layer);
     pts.forEach(([id,l],i)=>L.marker(S[id].ll,{icon:pin(C[S[id].c],i+1,1)}).bindPopup(popup(id,l)).addTo(layer));
     ['siena','sangim','chianti','pisa','tivoli'].forEach(id=>L.marker(S[id].ll,{icon:pin(C.tr,'★')}).bindPopup(popup(id,'一日遊選項')).addTo(layer));
-    L.marker(S.vce.ll,{icon:pin('#333','✈')}).bindPopup(popup('vce','1/29 抵達')).addTo(layer);
-    L.marker(S.fco.ll,{icon:pin('#333','✈')}).bindPopup(popup('fco','2/14 離開')).addTo(layer);
+    L.marker(S.vce.ll,{icon:pin('#7a6a55','✈')}).bindPopup(popup('vce','1/29 抵達')).addTo(layer);
+    L.marker(S.fco.ll,{icon:pin('#7a6a55','✈')}).bindPopup(popup('fco','2/14 離開')).addTo(layer);
     $('#mapDay').innerHTML=`<div class="card small">🚄 威尼斯 →（2h15）→ 佛羅倫斯 →（1h40）→ 羅馬。點城市看該城所有景點，點日期看當天路線。</div>`;
   }else{
     Object.entries(S).filter(([,s])=>s.c===k).forEach(([id,s])=>{
@@ -536,7 +548,7 @@ function drawDay(i){
   const seen=[];const ids=[];
   day.s.forEach(([id])=>{if(!ids.includes(id))ids.push(id)});
   const route=day.s.map(x=>S[x[0]].ll);
-  if(route.length>1&&day.c!=='tr')L.polyline(route,{color,weight:4,opacity:.75}).addTo(layer);
+  if(route.length>1&&day.c!=='tr'){L.polyline(route,{color:'#fff',weight:9,opacity:.85}).addTo(layer);L.polyline(route,{color:'#c9a24f',weight:4,dashArray:'1 9',lineCap:'round'}).addTo(layer);}
   day.s.forEach(([id,tm,note],j)=>{
     const s=S[id];
     L.marker(s.ll,{icon:pin(color,j+1,s.hotel),zIndexOffset:1000-j}).bindPopup(popup(id,`<b>${esc(tm)}</b> ${esc(note||'')}`)).addTo(layer);
@@ -555,10 +567,10 @@ function dayCard(i,compact){
     ${note?`<div class="note">${esc(note)}</div>`:''}</li>`).join('');
   const gm='https://www.google.com/maps/dir/'+x.s.map(([id])=>S[id].ll.join(',')).join('/');
   return `<div class="card day"${compact?'':` id="day${i}"`} style="--c:${col}">
-    <div class="dh"><span class="dn">DAY ${i+1}・${CITY[x.c]}</span><span class="dt">${x.d}（${x.w}）</span><span class="theme">${esc(x.t)}</span></div>
+    <div class="dh"><span class="dn">第 ${i+1} 幕・${CITY[x.c]}</span><span class="dt">${x.d}（${x.w}）</span><span class="theme">${esc(x.t)}</span></div>
     <ul class="tl">${items}</ul>
     ${x.warn?`<div class="warn">⚠ ${esc(x.warn)}</div>`:''}
-    ${N.map((n,k)=>n.day===i?`<div class="warn" style="background:#e7eaf8;color:#2b3a8c">🌙 晚上：<a href="#" onclick="show('night');setTimeout(()=>document.getElementById('night${k}').scrollIntoView(),60);return false">${esc(n.t)}</a></div>`:'').join('')}
+    ${N.map((n,k)=>n.day===i?`<div class="warn" style="background:#e9ebff;color:#4b558f">🌙 晚上：<a href="#" onclick="show('night');setTimeout(()=>document.getElementById('night${k}').scrollIntoView(),60);return false">${esc(n.t)}</a></div>`:'').join('')}
     <div class="btnrow">${compact?'':`<a class="btn p" href="#" onclick="show('map');drawDay(${i});return false">🗺️ 看路線</a>`}
     <a class="btn" target="_blank" href="${gm}">Google 地圖整天路線</a></div></div>`;
 }
@@ -568,8 +580,9 @@ function renderPlan(){
   const first=dateOf('1/29').getDay();
   for(let k=0;k<first;k++)cal.innerHTML+='<div class="d x"></div>';
   D.forEach((x,i)=>{cal.innerHTML+=`<div class="d" style="background:${C[x.c]}" onclick="document.getElementById('day${i}').scrollIntoView({behavior:'smooth'})">${x.d}<small>${esc(x.t.split(/[・：→]/)[0].slice(0,6))}</small></div>`});
-  cal.innerHTML+=`<div class="d" style="background:#333">2/15<small>抵台 20:40</small></div>`;
-  $('#days').innerHTML=D.map((x,i)=>dayCard(i)).join('');
+  cal.innerHTML+=`<div class="d" style="background:#a08c6a">2/15<small>抵台 20:40</small></div>`;
+  const CH={0:'第一章・水都威尼斯',4:'第二章・花之城佛羅倫斯',9:'第三章・永恆之城羅馬'};
+  $('#days').innerHTML=D.map((x,i)=>(CH[i]?`<div class="chapter"><span>${CH[i]}</span></div>`:'')+dayCard(i)).join('');
 }
 
 /* ---------- spots ---------- */
@@ -580,7 +593,7 @@ function spotCard(id){
   const m=IMG[id];
   return `<div class="card spot" id="spot-${id}">
    ${m?`<div class="ph"><img loading="lazy" src="${m.img}" alt="${esc(s.n)}">${m.cap?`<span class="cp">${esc(m.cap)}</span>`:''}<a class="cr" target="_blank" href="${m.page}">Wikipedia</a></div>`:''}
-   <div class="top"><div><div class="nm">${esc(s.n)}</div><div class="it">${esc(s.it)}</div></div><span class="badge ${b[1]}">${b[0]}</span></div>
+   <div class="top"><div><div class="nm">${esc(s.n)}</div><div class="it">${esc(s.it)}</div>${s.hotel?'':`<div class="stars">${'★'.repeat(s.mine?5:s.b!=='free'?4:3)}</div>`}</div><span class="badge ${b[1]}">${b[0]}</span></div>
    <div class="tags"><span class="tag" style="background:${C[s.c]};color:#fff">${CITY[s.c]}</span>${s.mine?'<span class="tag mine">🩷 我們想去</span>':''}${s.hotel?'<span class="tag">🏨 住宿</span>':''}${s.close?`<span class="tag">休：${esc(s.close)}</span>`:''}</div>
    <div>${s.d}</div>
    <dl class="kv">${s.price?`<dt>票價</dt><dd>${esc(s.price)}</dd>`:''}${s.hours?`<dt>時間</dt><dd>${esc(s.hours)}</dd>`:''}${days.length?`<dt>排在</dt><dd>${days.join('、')}</dd>`:''}</dl>
