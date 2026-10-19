@@ -114,6 +114,20 @@ th{color:var(--sub);font-weight:600}
 :root[data-theme="dark"] .fab{color:#10201c}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fab{color:#10201c}}
 .empty{color:var(--sub);text-align:center;padding:20px}
+.ph{margin:-12px -14px 10px;border-radius:14px 14px 0 0;overflow:hidden;position:relative;background:var(--line);aspect-ratio:16/9}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .cr{position:absolute;right:6px;bottom:4px;font-size:10px;color:#fff;background:rgba(0,0,0,.45);padding:1px 6px;border-radius:6px;text-decoration:none}
+.ph .cp{position:absolute;left:6px;bottom:4px;font-size:11px;color:#fff;background:rgba(0,0,0,.5);padding:1px 7px;border-radius:6px}
+.tl li .th{float:right;width:56px;height:42px;object-fit:cover;border-radius:7px;margin-left:8px;background:var(--line)}
+.pop-img{width:100%;height:110px;object-fit:cover;border-radius:8px;margin:2px 0 6px;display:block}
+.night{border-left:5px solid #2b3a8c}
+.night .tl li .n{background:#2b3a8c}
+.zone{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.zone:last-child{border:0}
+.lv{flex:0 0 auto;font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;color:#fff}
+.lv.g{background:#2e7d32}.lv.y{background:#e08a00}.lv.r{background:#c62828}
+.clock{display:grid;grid-template-columns:repeat(6,1fr);border-radius:10px;overflow:hidden;font-size:11px;text-align:center;color:#fff;margin:8px 0}
+.clock div{padding:6px 0}
 </style>
 </head>
 <body>
@@ -125,6 +139,7 @@ th{color:var(--sub);font-weight:600}
 <nav id="tabs">
   <button data-t="map" class="on">🗺️ 地圖</button>
   <button data-t="plan">📅 行程</button>
+  <button data-t="night">🌙 夜遊</button>
   <button data-t="spots">📍 景點</button>
   <button data-t="book">🎟️ 預約</button>
   <button data-t="stay">🏨 住宿交通</button>
@@ -155,6 +170,14 @@ th{color:var(--sub);font-weight:600}
   <div class="card"><div class="cal" id="cal"></div>
   <div class="small" style="margin-top:6px">點日期跳到那天。⚠ 2/6 農曆除夕、2/7 初一；2/4–2/10 台灣春節連假。</div></div>
   <div id="days"></div>
+</section>
+
+<section id="s-night">
+  <h2>🌙 夜遊路線</h2>
+  <div class="card small">二月下午 5 點半就天黑，晚上才是看夜景的時間。路線都走<b>有燈、有人的大路</b>，起點或終點就是飯店。點「看路線」會在地圖上畫出來。</div>
+  <div id="nightList"></div>
+  <h2>🛡️ 晚上大概到幾點都安心？</h2>
+  <div id="safety"></div>
 </section>
 
 <section id="s-spots">
@@ -244,6 +267,13 @@ const S={
  siena:{n:'西恩納（一日遊）',it:'Siena – Piazza del Campo',c:'tr',ll:[43.31830,11.33170],b:'free',d:'從佛羅倫斯 Autostazione 搭 Autolinee Toscane 快速巴士約 1h15（直達市區，比火車方便）。扇形廣場、西恩納大教堂（地板鑲嵌）。網友：「冬天的西恩納超棒、人超少」。',close:'小鎮餐廳冬天部分休息'},
  sangim:{n:'聖吉米尼亞諾',it:'San Gimignano',c:'tr',ll:[43.46770,11.04320],b:'free',mine:1,d:'「中世紀曼哈頓」：山城裡留著十幾座石塔。Gelateria Dondoli 冰淇淋拿過世界冠軍。托斯卡尼一日遊團幾乎都會停。'},
  chianti:{n:'奇揚第酒區',it:'Chianti（Greve in Chianti 一帶）',c:'tr',ll:[43.58380,11.31680],b:'rec',mine:1,d:'佛羅倫斯和西恩納之間的葡萄酒產區，丘陵加柏樹的托斯卡尼經典風景。一日遊團通常含酒莊品酒＋午餐。冬天葡萄園光禿禿的，但酒莊室內照樣能品酒。'},
+ strada:{n:'Strada Nova 大街',it:'Strada Nova',c:'ve',ll:[45.44190,12.33130],b:'free',d:'從車站到里亞托的主要步行大街，晚上最熱鬧、燈最亮。迷路就跟著牆上黃色「Per Ferrovia（往車站）」指標走回飯店。'},
+ miseri:{n:'Misericordia 運河酒吧街',it:'Fondamenta della Misericordia / Ormesini',c:'ve',ll:[45.44490,12.33150],b:'free',d:'Cannaregio 在地人的夜生活區，運河邊一排小酒館，離飯店走路 10 分鐘。'},
+ repub:{n:'共和廣場',it:'Piazza della Repubblica (Firenze)',c:'fi',ll:[43.77140,11.25410],b:'free',d:'有旋轉木馬的大廣場，晚上燈很漂亮，離飯店 5 分鐘。'},
+ strinita:{n:'聖三一橋',it:'Ponte Santa Trinita',c:'fi',ll:[43.76970,11.25020],b:'free',d:'拍老橋夜景的最佳位置（從這座橋往東看）。'},
+ spirito:{n:'聖靈廣場',it:'Piazza Santo Spirito',c:'fi',ll:[43.76710,11.24760],b:'free',d:'Oltrarno 區在地人的晚上聚會廣場，餐廳和酒吧圍一圈。'},
+ quirinale:{n:'奎里納萊廣場',it:'Piazza del Quirinale',c:'ro',ll:[41.89960,12.48710],b:'free',d:'總統府前的高地廣場，晚上看聖彼得圓頂的夜景，有衛兵站崗，很安心。從飯店到許願池順路經過。'},
+ sisto:{n:'西斯托橋',it:'Ponte Sisto',c:'ro',ll:[41.89240,12.47060],b:'free',d:'連接鮮花廣場和特拉斯提弗列的行人橋，晚上可以看到聖彼得圓頂。'},
  pisa:{n:'比薩斜塔（一日遊替代）',it:'Pisa – Torre pendente',c:'tr',ll:[43.72300,10.39660],b:'must',d:'火車約 1 小時。廣場免費；<b>登塔必須預約時段</b>。可順遊盧卡 Lucca 城牆。',price:'登塔約 €20',url:'https://www.opapisa.it/en/'},
  // 羅馬
  suite69:{n:'69 Suite Boutique（飯店）',it:'Via Nazionale 69',c:'ro',ll:[41.89928,12.49122],hotel:1,b:'free',d:'羅馬住的飯店，Monti 區，走路約 10 分鐘到 Termini 車站、15 分鐘到許願池。'},
@@ -345,6 +375,89 @@ const D=[
   warn:'2/15（一）20:40 抵桃園。退稅單要在 FCO 辦。'}
 ];
 
+/* ---------- 夜遊 ---------- */
+// day = D index
+const N=[
+ {day:1,c:'ve',t:'聖馬可夜色 → 走大路回飯店',km:'約 2.5 km・2–3 小時',s:[
+   ['sanmarco','18:00','廣場和大教堂打燈，咖啡館（Florian）常有小樂團'],['rialto','19:00','橋上看大運河夜景'],
+   ['strada','19:30','沿大街找晚餐'],['uvis','21:30','跟著黃色「Per Ferrovia」指標回飯店']]},
+ {day:3,c:'ve',t:'大運河夜船（1 號線）',km:'船程約 35 分鐘',s:[
+   ['salute','17:15','藍調時刻拍大運河口'],['accbr','17:45','Accademia 站上 1 號船，坐船頭或船尾的戶外位'],
+   ['rialto','18:05','船經過里亞托橋下，兩岸宮殿都打燈'],['uvis','18:30','Ferrovia 站下船，走 3 分鐘到飯店'],['miseri','19:30','運河邊小酒館晚餐']]},
+ {day:5,c:'fi',t:'夕陽 → 過河 → 聖靈廣場',km:'約 3 km',s:[
+   ['miniato','17:25','看完夕陽，趁天還沒全黑往下走（或搭 12/13 號公車）'],['pvecchio','18:15','老橋燈亮'],
+   ['strinita','18:30','從這座橋拍老橋夜景'],['spirito','19:00','Oltrarno 晚餐'],['repub','21:15','旋轉木馬'],['spadai','21:30','回飯店']]},
+ {day:8,c:'fi',t:'除夕夜：大教堂打燈散步',km:'約 2 km・1.5 小時',s:[
+   ['duomo','19:30','打燈的大教堂'],['repub','20:00',''],['signoria','20:20','露天雕塑打燈'],['pvecchio','20:45',''],['spadai','21:30','回飯店']]},
+ {day:9,c:'ro',t:'抵達夜：許願池 → 西班牙階梯',km:'約 3 km 來回',s:[
+   ['suite69','19:30','沿 Via Nazionale 大街出發'],['quirinale','19:45','高處看圓頂夜景'],['trevi','20:00','晚上池邊區要 €2，外圍免費'],
+   ['spagna','20:45','階梯打燈'],['suite69','21:30','原路走回（都是大路）']]},
+ {day:10,c:'ro',t:'古羅馬夜景',km:'約 2.5 km',s:[
+   ['monti','18:30','Monti 區晚餐'],['colosseo','20:00','打燈的競技場（從帝國大道這側看）'],
+   ['fori','20:15','大道兩側遺跡打燈'],['venezia','20:45','白色紀念堂夜景'],['suite69','21:15','走 Via Nazionale 回飯店']]},
+ {day:12,c:'ro',t:'萬神殿 → 天使橋',km:'約 2.5 km，回程搭計程車',s:[
+   ['pantheon','19:30','圓頂打燈'],['navona','20:00','噴泉夜景'],['angelo','20:40','天使橋＋聖天使堡打燈'],['suite69','21:30','在 Piazza Navona／天使橋旁叫計程車回去']]},
+ {day:15,c:'ro',t:'特拉斯提弗列最後一晚',km:'約 1.5 km，回程搭計程車',s:[
+   ['traste','19:00','晚餐'],['sisto','21:00','走過橋，回頭看聖彼得圓頂'],['campo','21:15','鮮花廣場酒吧區'],['suite69','22:00','從 Corso Vittorio 叫計程車回飯店']]}
+];
+const ZONES={
+ ve:{title:'威尼斯',note:'整體犯罪率很低。晚上的風險主要是<b>迷路、起霧、運河邊沒有欄杆</b>，不是治安。',rows:[
+  ['g','主要路線：車站–Strada Nova–里亞托–聖馬可','到 23:00 都還有人。飯店就在這條路線的起點。'],
+  ['g','1 號線水上巴士','晚上照常開，午夜後換成夜間 N 線，班次較少。'],
+  ['y','Santa Lucia 車站、擁擠的船站','扒手比較多，包包背前面。'],
+  ['y','深夜 Castello、Santa Croce 的小巷','午夜後幾乎沒人，不危險但容易迷路，別走進去。']]},
+ fi:{title:'佛羅倫斯',note:'飯店在大教堂旁邊，晚上走回去都是最熱鬧的大路。',rows:[
+  ['g','大教堂–共和廣場–領主廣場–老橋–聖靈廣場','熱鬧到 23:00–24:00，有警察巡邏。'],
+  ['y','新聖母車站周邊、Via Palazzuolo／Via della Scala','晚上遊蕩的人比較多，扒手熱區，快速經過就好。'],
+  ['y','San Lorenzo 市集收攤後','在飯店北邊，晚上回飯店走 Via de\' Martelli（大教堂這條）就好。'],
+  ['y','米開朗基羅廣場天黑後','人會變少，看完夕陽趁還有點亮就下山，或搭公車／計程車。'],
+  ['r','卡西內公園 Cascine','天黑後不要去（各家指南一致的警告）。']]},
+ ro:{title:'羅馬',note:'景點區晚上很熱鬧，主要風險是<b>扒手</b>，不是暴力犯罪。',rows:[
+  ['g','歷史中心：許願池、萬神殿、納沃納、西班牙階梯','遊客和警察都多，到 23:00–24:00 都很熱鬧。'],
+  ['g','Monti 區（飯店這區）','餐廳酒吧開到很晚，被很多指南列為最安心的區域之一。'],
+  ['g','Via Nazionale 大街（飯店門口）','有燈的大馬路，人車都多。'],
+  ['y','特拉斯提弗列','熱鬧到深夜，但人擠時顧好包包；回程建議搭計程車。'],
+  ['y','競技場周邊','夜景從帝國大道這側看；2026/8 起被劃為「紅區」、警力加強。'],
+  ['r','Termini 車站南邊 Esquilino（Piazza Vittorio、Via Giolitti）','晚上不要逗留、不要穿過去。2025 起被政府劃為「紅區」。'],
+  ['r','競技場旁的 Colle Oppio 公園','晚上不要進公園。']]}
+};
+function renderNight(){
+  $('#nightList').innerHTML=N.map((x,i)=>{
+    const d=D[x.day];
+    const items=x.s.map(([id,tm,note],j)=>`<li><span class="n">${j+1}</span>${thumb(id)}<div class="tm">${esc(tm)}</div>
+      <div class="w"><a href="#" onclick="openSpot('${id}');return false" style="color:inherit;text-decoration:none">${esc(S[id].n)}</a></div>${note?`<div class="note">${esc(note)}</div>`:''}</li>`).join('');
+    return `<div class="card night" id="night${i}"><div class="dh"><span class="dn" style="color:${C[x.c]}">${CITY[x.c]}</span>
+      <span class="dt">🌙 ${d.d}（${d.w}）</span><span class="theme">${esc(x.t)}・${esc(x.km)}</span></div><ul class="tl">${items}</ul>
+      <div class="btnrow"><a class="btn p" href="#" onclick="show('map');drawNight(${i});return false">🗺️ 看路線</a>
+      <a class="btn" target="_blank" href="https://www.google.com/maps/dir/${x.s.map(([id])=>S[id].ll.join(',')).join('/')}/data=!4m2!4m1!3e2">Google 步行路線</a></div></div>`;
+  }).join('');
+  const clock=`<div class="clock"><div style="background:#2e7d32">17:30<br>天黑</div><div style="background:#2e7d32">19:00</div><div style="background:#2e7d32">21:00</div><div style="background:#2e7d32">22:00</div><div style="background:#e08a00">23:00<br>回飯店</div><div style="background:#c62828">00:00 後<br>計程車</div></div>`;
+  $('#safety').innerHTML=`<div class="card">${clock}
+   <div><b>結論：三個城市的景點區，晚上 23:00 前回到飯店都很安心。</b>23:00–24:00 大路上還有人，但巷子開始變空；過了午夜就搭計程車，別走路。</div>
+   <div class="small" style="margin-top:6px">這是整理網路旅遊指南、論壇的共識，不是官方統計。Numbeo 的數字也是：羅馬白天走路安全感約 75 分，晚上約 47 分，差別主要在扒手和車站周邊。</div></div>`+
+   Object.entries(ZONES).map(([k,z])=>`<div class="card" style="border-left:5px solid ${C[k]}"><h3 style="margin-top:0">${z.title}</h3><div class="small">${z.note}</div>
+    ${z.rows.map(([l,a,b])=>`<div class="zone"><span class="lv ${l}">${{g:'安心',y:'注意',r:'避開'}[l]}</span><div><b>${esc(a)}</b><br><span class="small">${b}</span></div></div>`).join('')}</div>`).join('')+
+   `<div class="card"><h3 style="margin-top:0">晚上通用守則</h3><ul style="margin:0;padding-left:18px;font-size:14px">
+    <li>走有燈、有人的大路，就算繞一點路也沒關係</li>
+    <li>羅馬叫車用 <b>FreeNow</b> 或 <b>itTaxi</b> App，只搭白色官方計程車</li>
+    <li>手機別放在餐廳戶外桌邊、別在路邊邊走邊滑；包包背前面、拉鍊朝內</li>
+    <li>有人搭訕塞東西、問路要你拿出手機 → 直接走開</li>
+    <li>回飯店前先在餐廳把下一段路線看好，別站在路中間看地圖</li>
+    <li>緊急電話 <a href="tel:112">112</a></li></ul>
+    <div class="small" style="margin-top:8px">參考：<a target="_blank" href="https://visitrome.com/rome/travel-guides/common-rome-questions/is-rome-safe-a-practical-safety-guide-for-travelers">Visit Rome</a>・<a target="_blank" href="https://chasingwhereabouts.com/blog/is-rome-safe-in-2026-neighborhoods-to-avoid-safe-areas-practical-tips">Rome 2026 neighborhoods</a>・<a target="_blank" href="https://www.thelocal.it/20250106/crime-romes-termini-station-designated-a-red-zone-but-what-does-that-mean">The Local：Termini 紅區</a>・<a target="_blank" href="https://www.ilpost.it/2026/08/28/roma-colosseo-zona-rossa-sicurezza/">Il Post：競技場紅區</a>・<a target="_blank" href="https://www.florencetourism.org/is-florence-safe/">Florence Tourism</a>・<a target="_blank" href="https://eurovistatrips.com/is-florence-safe-at-night/">Florence at night</a>・<a target="_blank" href="https://venicexplorer.com/the-city/visitor-information/how-safe-is-venice">Venice Explorer</a>・<a target="_blank" href="https://venicexplorer.com/the-city/blog/venice-after-7-pm-night-walking-routes-late-night-cicchetti">Venice after 7pm</a></div></div>`;
+}
+function drawNight(i){
+  layer.clearLayers();setChips('',-1);
+  const x=N[i];const route=x.s.map(([id])=>S[id].ll);
+  L.polyline(route,{color:'#2b3a8c',weight:5,opacity:.85,dashArray:'2 8',lineCap:'round'}).addTo(layer);
+  x.s.forEach(([id,tm,note],j)=>L.marker(S[id].ll,{icon:pin('#2b3a8c',j+1,S[id].hotel),zIndexOffset:1000-j}).bindPopup(popup(id,`<b>${esc(tm)}</b> ${esc(note||'')}`)).addTo(layer));
+  const z=ZONES[x.c];
+  map.fitBounds(L.latLngBounds(route).pad(0.2),{maxZoom:16});
+  $('#mapDay').innerHTML=`<div class="card small">🌙 ${D[x.day].d} 夜遊：${esc(x.t)}。${z?z.note:''} <a href="#" onclick="show('night');return false">看安全區域</a></div>`;
+}
+const IMG={"uvis":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Stazione_di_Venezia_Santa_Lucia_-_panoramio_-_Mister_No_%281%29.jpg/640px-Stazione_di_Venezia_Santa_Lucia_-_panoramio_-_Mister_No_%281%29.jpg","page":"https://en.wikipedia.org/wiki/Venezia_Santa_Lucia_railway_station","cap":"飯店旁：Santa Lucia 車站"},"vce":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Aeroporto_di_Venezia_-_vue_aerienne.jpg/640px-Aeroporto_di_Venezia_-_vue_aerienne.jpg","page":"https://en.wikipedia.org/wiki/Venice_Marco_Polo_Airport","cap":""},"guglie":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Ponte_delle_Guglie_%28Venice%29.jpg/640px-Ponte_delle_Guglie_%28Venice%29.jpg","page":"https://en.wikipedia.org/wiki/Ponte_delle_Guglie","cap":""},"rialto":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Rialto_2025_4.jpg/640px-Rialto_2025_4.jpg","page":"https://en.wikipedia.org/wiki/Rialto_Bridge","cap":""},"sanmarco":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Venezia_Basilica_di_San_Marco_Fassade_2.jpg/640px-Venezia_Basilica_di_San_Marco_Fassade_2.jpg","page":"https://en.wikipedia.org/wiki/St_Mark's_Basilica","cap":""},"campanile":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Campanile_of_St._Mark%27s_Basilica_-_remote_view.jpg/640px-Campanile_of_St._Mark%27s_Basilica_-_remote_view.jpg","page":"https://en.wikipedia.org/wiki/St_Mark's_Campanile","cap":""},"ducale":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/%28Venice%29_Doge%27s_Palace_and_campanile_of_St._Mark%27s_Basilica_facing_the_sea.jpg/640px-%28Venice%29_Doge%27s_Palace_and_campanile_of_St._Mark%27s_Basilica_facing_the_sea.jpg","page":"https://en.wikipedia.org/wiki/Doge's_Palace","cap":""},"sospiri":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Antonio_Contin_-_Ponte_dei_sospiri_%28Venice%29.jpg/640px-Antonio_Contin_-_Ponte_dei_sospiri_%28Venice%29.jpg","page":"https://en.wikipedia.org/wiki/Bridge_of_Sighs","cap":""},"bovolo":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Scala_Contarini_del_Bovolo_%28Venice%29.jpg/640px-Scala_Contarini_del_Bovolo_%28Venice%29.jpg","page":"https://en.wikipedia.org/wiki/Palazzo_Contarini_del_Bovolo","cap":""},"salute":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Santa_Maria_della_Salute_from_Hotel_Monaco.jpg/640px-Santa_Maria_della_Salute_from_Hotel_Monaco.jpg","page":"https://en.wikipedia.org/wiki/Santa_Maria_della_Salute","cap":""},"carnival":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Venice_Carnival_-_Masked_Lovers_%282010%29.jpg/640px-Venice_Carnival_-_Masked_Lovers_%282010%29.jpg","page":"https://en.wikipedia.org/wiki/Carnival_of_Venice","cap":""},"duomo":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Cattedrale_di_Santa_Maria_del_Fiore_%E2%80%93_Il_Duomo_di_Firenze.jpg/640px-Cattedrale_di_Santa_Maria_del_Fiore_%E2%80%93_Il_Duomo_di_Firenze.jpg","page":"https://en.wikipedia.org/wiki/Florence_Cathedral","cap":""},"giotto":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/CampanileGiotto-01.jpg/640px-CampanileGiotto-01.jpg","page":"https://en.wikipedia.org/wiki/Giotto's_Campanile","cap":""},"pvecchio":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Ponte_Vecchio_from_Ponte_alle_Grazie.jpg/640px-Ponte_Vecchio_from_Ponte_alle_Grazie.jpg","page":"https://en.wikipedia.org/wiki/Ponte_Vecchio","cap":""},"accad":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/David_at_the_Galleria_dell%27Accademia_%2861351%29.jpg/640px-David_at_the_Galleria_dell%27Accademia_%2861351%29.jpg","page":"https://en.wikipedia.org/wiki/Galleria_dell'Accademia","cap":""},"mcentrale":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Mercato_centrale_di_san_lorenzo_01.jpg/640px-Mercato_centrale_di_san_lorenzo_01.jpg","page":"https://en.wikipedia.org/wiki/Mercato_Centrale_(Florence)","cap":""},"miniato":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/San_Miniato_al_Monte%2C_exterior%2C_Florencia%2C_Italia%2C_2019_01_cropped.jpg/640px-San_Miniato_al_Monte%2C_exterior%2C_Florencia%2C_Italia%2C_2019_01_cropped.jpg","page":"https://en.wikipedia.org/wiki/San_Miniato_al_Monte","cap":""},"scroce":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Bas%C3%ADlica_de_la_Santa_Cruz%2C_Florencia%2C_Italia%2C_2022-09-18%2C_DD_95.jpg/640px-Bas%C3%ADlica_de_la_Santa_Cruz%2C_Florencia%2C_Italia%2C_2022-09-18%2C_DD_95.jpg","page":"https://en.wikipedia.org/wiki/Santa_Croce%2C_Florence","cap":""},"smnch":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Florence%2C_Santa_Maria_Novella%2C_facade.jpg/640px-Florence%2C_Santa_Maria_Novella%2C_facade.jpg","page":"https://en.wikipedia.org/wiki/Santa_Maria_Novella","cap":""},"sangim":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/1_Aerial_pano_san_gimignano_%282%29a.jpg/640px-1_Aerial_pano_san_gimignano_%282%29a.jpg","page":"https://en.wikipedia.org/wiki/San_Gimignano","cap":""},"colosseo":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Colosseo_2020.jpg/640px-Colosseo_2020.jpg","page":"https://en.wikipedia.org/wiki/Colosseum","cap":""},"foro":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Foro_Romano_Musei_Capitolini_Roma.jpg/640px-Foro_Romano_Musei_Capitolini_Roma.jpg","page":"https://en.wikipedia.org/wiki/Roman_Forum","cap":""},"trevi":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Trevi_Fountain_-_Roma.jpg/640px-Trevi_Fountain_-_Roma.jpg","page":"https://en.wikipedia.org/wiki/Trevi_Fountain","cap":""},"pantheon":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Pantheon_%28Rome%29_-_Right_side_and_front.jpg/640px-Pantheon_%28Rome%29_-_Right_side_and_front.jpg","page":"https://en.wikipedia.org/wiki/Pantheon%2C_Rome","cap":""},"navona":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Piazza_Navona_%28Rome%29_at_night.jpg/640px-Piazza_Navona_%28Rome%29_at_night.jpg","page":"https://en.wikipedia.org/wiki/Piazza_Navona","cap":""},"campo":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Campo_dei_Fiori.jpg/640px-Campo_dei_Fiori.jpg","page":"https://en.wikipedia.org/wiki/Campo_de'_Fiori","cap":""},"spagna":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Piazza_di_Spagna_%28Rome%29_0004.jpg/640px-Piazza_di_Spagna_%28Rome%29_0004.jpg","page":"https://en.wikipedia.org/wiki/Spanish_Steps","cap":""},"vatican":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Musei_vaticani_Coat_of_Arms.svg/640px-Musei_vaticani_Coat_of_Arms.svg.png","page":"https://en.wikipedia.org/wiki/Vatican_Museums","cap":""},"speter":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg/640px-Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg","page":"https://en.wikipedia.org/wiki/St._Peter's_Basilica","cap":""},"angelo":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Castel_Sant%27Angelo_at_Night.jpg/640px-Castel_Sant%27Angelo_at_Night.jpg","page":"https://en.wikipedia.org/wiki/Castel_Sant'Angelo","cap":""},"borghese":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Galleria_Borghese_-_logo_%28Italy%2C_2022-%29.svg/640px-Galleria_Borghese_-_logo_%28Italy%2C_2022-%29.svg.png","page":"https://en.wikipedia.org/wiki/Galleria_Borghese","cap":""},"pincio":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Terrazza_del_Pincio_%2846397854832%29.jpg/640px-Terrazza_del_Pincio_%2846397854832%29.jpg","page":"https://en.wikipedia.org/wiki/Pincian_Hill","cap":""},"traste":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Santa_Maria_in_Trastevere_fountain.jpg/640px-Santa_Maria_in_Trastevere_fountain.jpg","page":"https://en.wikipedia.org/wiki/Trastevere","cap":""},"gianicolo":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Janiculum.jpg/640px-Janiculum.jpg","page":"https://en.wikipedia.org/wiki/Janiculum","cap":""},"monti":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Rome_via_dei_fori_imperiali_20050922.jpg/640px-Rome_via_dei_fori_imperiali_20050922.jpg","page":"https://en.wikipedia.org/wiki/Monti_(rione_of_Rome)","cap":""},"fco":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Rome_Fiumicino_Leonardo_da_Vinci_International_Airport%2C_Aeroporto_internazionale_di_Roma-Fiumicino_%22Leonardo_da_Vinci%22.jpg/640px-Rome_Fiumicino_Leonardo_da_Vinci_International_Airport%2C_Aeroporto_internazionale_di_Roma-Fiumicino_%22Leonardo_da_Vinci%22.jpg","page":"https://en.wikipedia.org/wiki/Rome_Fiumicino_Airport","cap":""},"mercato":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Ponte_di_Rialto_Venice_1.jpg/960px-Ponte_di_Rialto_Venice_1.jpg","page":"https://en.m.wikipedia.org/wiki/Rialto","cap":""},"acqua":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Libreria_Acqua_Alta_04.jpg/960px-Libreria_Acqua_Alta_04.jpg","page":"https://en.m.wikipedia.org/wiki/Libreria_Acqua_Alta","cap":""},"accbr":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Accademia_bridge_in_Venice_%28South_East_exposure%29.jpg/960px-Accademia_bridge_in_Venice_%28South_East_exposure%29.jpg","page":"https://en.m.wikipedia.org/wiki/Ponte_dell%27Accademia","cap":""},"dogana":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/0_Venise%2C_Canal_della_Giudecca%2C_Dogana%2C_Santa._Maria_della_Salute_et_Canal_Grande.JPG/960px-0_Venise%2C_Canal_della_Giudecca%2C_Dogana%2C_Santa._Maria_della_Salute_et_Canal_Grande.JPG","page":"https://en.m.wikipedia.org/wiki/Punta_della_Dogana","cap":""},"burano":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Burano_Venice_17.jpg/960px-Burano_Venice_17.jpg","page":"https://en.m.wikipedia.org/wiki/Burano","cap":""},"murano":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Murano_sunset.JPG/960px-Murano_sunset.JPG","page":"https://en.m.wikipedia.org/wiki/Murano","cap":""},"gondola":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Gondola_Ride.jpg/960px-Gondola_Ride.jpg","page":"https://en.m.wikipedia.org/wiki/Gondola","cap":""},"spadai":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Palazzo_Medici_Riccardi-Florence.jpg/960px-Palazzo_Medici_Riccardi-Florence.jpg","page":"https://en.m.wikipedia.org/wiki/Palazzo_Medici_Riccardi","cap":"飯店旁：梅迪奇宮"},"smn":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Stazione_di_santa_maria_novella_vista_dal_convento_di_santa_maria_novella.jpg/960px-Stazione_di_santa_maria_novella_vista_dal_convento_di_santa_maria_novella.jpg","page":"https://en.m.wikipedia.org/wiki/Firenze_Santa_Maria_Novella_railway_station","cap":""},"uffizi":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Florence%2C_Italy_-_panoramio_%28125%29.jpg/960px-Florence%2C_Italy_-_panoramio_%28125%29.jpg","page":"https://en.m.wikipedia.org/wiki/Uffizi","cap":""},"signoria":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Piazza_Signoria_-_Firenze.jpg/960px-Piazza_Signoria_-_Firenze.jpg","page":"https://en.m.wikipedia.org/wiki/Piazza_della_Signoria","cap":""},"zaza":{"img":"https://upload.wikimedia.org/wikipedia/commons/1/12/Bistecca_alla_fiorentina-01.jpg","page":"https://en.m.wikipedia.org/wiki/Bistecca_alla_fiorentina","cap":"招牌：佛羅倫斯大牛排"},"pitti":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Palazzo_Pitti_nel_tardo_pomeriggio.jpg/960px-Palazzo_Pitti_nel_tardo_pomeriggio.jpg","page":"https://en.m.wikipedia.org/wiki/Palazzo_Pitti","cap":""},"siena":{"img":"https://upload.wikimedia.org/wikipedia/commons/0/0a/Siena5.jpg","page":"https://en.m.wikipedia.org/wiki/Piazza_del_Campo","cap":""},"chianti":{"img":"https://upload.wikimedia.org/wikipedia/commons/6/66/Fiasco_di_vino_rosso_da_tavola_Monteriggioni.jpg","page":"https://en.m.wikipedia.org/wiki/Chianti","cap":""},"pisa":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Italy_-_Pisa_-_Leaning_Tower.jpg/960px-Italy_-_Pisa_-_Leaning_Tower.jpg","page":"https://en.m.wikipedia.org/wiki/Leaning_Tower_of_Pisa","cap":""},"suite69":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/2013-04-11_Roma_Palazzo_delle_Esposizioni.jpg/960px-2013-04-11_Roma_Palazzo_delle_Esposizioni.jpg","page":"https://en.m.wikipedia.org/wiki/Palazzo_delle_Esposizioni","cap":"飯店旁：Via Nazionale"},"termini":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Roma_termini_01.jpg/960px-Roma_termini_01.jpg","page":"https://en.m.wikipedia.org/wiki/Roma_Termini_railway_station","cap":""},"fori":{"img":"https://upload.wikimedia.org/wikipedia/commons/d/d6/063ViaForiImperiali.jpg","page":"https://en.m.wikipedia.org/wiki/Via_dei_Fori_Imperiali","cap":""},"venezia":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Vittoriano_Altare_della_Patria_2013-09-16.jpg/960px-Vittoriano_Altare_della_Patria_2013-09-16.jpg","page":"https://en.m.wikipedia.org/wiki/Victor_Emmanuel_II_Monument","cap":""},"marcello":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Teatro_di_Marcello_intero.jpg/960px-Teatro_di_Marcello_intero.jpg","page":"https://en.m.wikipedia.org/wiki/Theatre_of_Marcellus","cap":""},"bocca":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Et%C3%A0_imperiale%2C_chiusino_a_forma_di_mascherone_di_divinit%C3%A0_fluviale%2C_detta_bocca_della_verit%C3%A0%2C_collocata_qui_nel_1632.jpg/960px-Et%C3%A0_imperiale%2C_chiusino_a_forma_di_mascherone_di_divinit%C3%A0_fluviale%2C_detta_bocca_della_verit%C3%A0%2C_collocata_qui_nel_1632.jpg","page":"https://en.m.wikipedia.org/wiki/Bocca_della_Verit%C3%A0","cap":""},"ignazio":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Church_of_Sant%27Ignazio_di_Loyola.jpg/960px-Church_of_Sant%27Ignazio_di_Loyola.jpg","page":"https://en.m.wikipedia.org/wiki/Sant%27Ignazio,_Rome","cap":""},"trinita":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Trinit%C3%A0_dei_monti_-_panoramio.jpg/960px-Trinit%C3%A0_dei_monti_-_panoramio.jpg","page":"https://en.m.wikipedia.org/wiki/Trinit%C3%A0_dei_Monti","cap":""},"smm":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Basilica_di_Santa_Maria_Maggiore_-_Roma.jpg/960px-Basilica_di_Santa_Maria_Maggiore_-_Roma.jpg","page":"https://en.m.wikipedia.org/wiki/Santa_Maria_Maggiore","cap":""},"tivoli":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Villa_Deste_park_Rometta_2011_2.jpg/960px-Villa_Deste_park_Rometta_2011_2.jpg","page":"https://en.m.wikipedia.org/wiki/Villa_d%27Este","cap":""},"michel":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Firenze_-_Piazzale_Michelangelo%2C_Firenze%2C_Italy_-_April_6%2C_2015_02.jpg/960px-Firenze_-_Piazzale_Michelangelo%2C_Firenze%2C_Italy_-_April_6%2C_2015_02.jpg","page":"https://en.m.wikipedia.org/wiki/Florence","cap":"從廣場看出去的佛羅倫斯"},"plaza":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Via_del_Corso_%2852501354470%29.jpg/960px-Via_del_Corso_%2852501354470%29.jpg","page":"https://en.m.wikipedia.org/wiki/Via_del_Corso","cap":"飯店所在：Via del Corso"}};
+function thumb(id){const m=IMG[id];return m?`<img class="th" loading="lazy" src="${m.img}" alt="">`:''}
+
 /* ---------- 共用 ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
@@ -370,7 +483,7 @@ function pin(color,label,hotel){
 }
 function popup(id,extra){
   const s=S[id];const b=BADGE[s.b];
-  return `<b>${esc(s.n)}</b><br><span class="small">${esc(s.it)}</span><br>`+
+  return (IMG[id]?`<img class="pop-img" src="${IMG[id].img}" alt="">`:'')+`<b>${esc(s.n)}</b><br><span class="small">${esc(s.it)}</span><br>`+
    (extra?`<div style="margin:4px 0">${extra}</div>`:'')+
    `<span class="badge ${b[1]}" style="font-size:11px">${b[0]}</span>
    <div class="btnrow"><a class="btn p" target="_blank" href="${gdir(s.ll)}">導航</a>
@@ -436,7 +549,7 @@ function drawDay(i){
 /* ---------- plan ---------- */
 function dayCard(i,compact){
   const x=D[i];const col=C[x.c];
-  const items=x.s.map(([id,tm,note,tr],j)=>`<li><span class="n${tr?' t':''}">${tr?'🚆':j+1}</span>
+  const items=x.s.map(([id,tm,note,tr],j)=>`<li><span class="n${tr?' t':''}">${tr?'🚆':j+1}</span>${tr?'':thumb(id)}
     <div class="tm">${esc(tm)}</div><div class="w"><a href="#" onclick="openSpot('${id}');return false" style="color:inherit;text-decoration:none">${esc(S[id].n)}</a>
     ${S[id].b!=='free'?`<span class="badge ${BADGE[S[id].b][1]}" style="font-size:10px;padding:1px 6px">${BADGE[S[id].b][0]}</span>`:''}</div>
     ${note?`<div class="note">${esc(note)}</div>`:''}</li>`).join('');
@@ -445,6 +558,7 @@ function dayCard(i,compact){
     <div class="dh"><span class="dn">DAY ${i+1}・${CITY[x.c]}</span><span class="dt">${x.d}（${x.w}）</span><span class="theme">${esc(x.t)}</span></div>
     <ul class="tl">${items}</ul>
     ${x.warn?`<div class="warn">⚠ ${esc(x.warn)}</div>`:''}
+    ${N.map((n,k)=>n.day===i?`<div class="warn" style="background:#e7eaf8;color:#2b3a8c">🌙 晚上：<a href="#" onclick="show('night');setTimeout(()=>document.getElementById('night${k}').scrollIntoView(),60);return false">${esc(n.t)}</a></div>`:'').join('')}
     <div class="btnrow">${compact?'':`<a class="btn p" href="#" onclick="show('map');drawDay(${i});return false">🗺️ 看路線</a>`}
     <a class="btn" target="_blank" href="${gm}">Google 地圖整天路線</a></div></div>`;
 }
@@ -463,7 +577,9 @@ let spotFilter='all';
 function spotCard(id){
   const s=S[id];const b=BADGE[s.b];
   const days=D.map((x,i)=>x.s.some(y=>y[0]===id)?`<a href="#" onclick="show('plan');setTimeout(()=>document.getElementById('day${i}').scrollIntoView(),60);return false">${x.d}</a>`:'').filter(Boolean);
+  const m=IMG[id];
   return `<div class="card spot" id="spot-${id}">
+   ${m?`<div class="ph"><img loading="lazy" src="${m.img}" alt="${esc(s.n)}">${m.cap?`<span class="cp">${esc(m.cap)}</span>`:''}<a class="cr" target="_blank" href="${m.page}">Wikipedia</a></div>`:''}
    <div class="top"><div><div class="nm">${esc(s.n)}</div><div class="it">${esc(s.it)}</div></div><span class="badge ${b[1]}">${b[0]}</span></div>
    <div class="tags"><span class="tag" style="background:${C[s.c]};color:#fff">${CITY[s.c]}</span>${s.mine?'<span class="tag mine">🩷 我們想去</span>':''}${s.hotel?'<span class="tag">🏨 住宿</span>':''}${s.close?`<span class="tag">休：${esc(s.close)}</span>`:''}</div>
    <div>${s.d}</div>
@@ -620,7 +736,7 @@ function initToday(){
   $('#fab').onclick=()=>{const k=todayIndex();if(k>=0){show('map');drawDay(k)}else{show('plan')}};
 }
 
-initMap();renderPlan();initSpots();renderBook();renderStay();renderTips();initToday();
+initMap();renderNight();renderPlan();initSpots();renderBook();renderStay();renderTips();initToday();
 const ti=todayIndex();
 if(ti>=0)drawDay(ti);else{const m=store.get('map',{k:'all'});if(m.i!=null&&D[m.i])drawDay(m.i);else drawCity(m.k||'all')}
 const lastTab=store.get('tab','map');if(lastTab!=='map')show(lastTab);
