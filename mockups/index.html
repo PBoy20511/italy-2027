@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>遊戲地圖風格預覽</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;700;900&family=Zen+Maru+Gothic:wght@500;700;900&family=Anton&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{font-family:"Noto Sans TC",sans-serif;-webkit-font-smoothing:antialiased}
+#app{position:relative;width:var(--w,100vw);height:100vh;overflow:hidden}
+#map{position:absolute;inset:0;z-index:1}
+.leaflet-control-attribution{font-size:8px!important;opacity:.6}
+.leaflet-control-zoom{display:none}
+.top,.sheet,.tabbar,.deco{position:absolute;z-index:500}
+.top{left:0;right:0;top:0}
+.sheet{left:0;right:0;bottom:62px}
+.tabbar{left:0;right:0;bottom:0;height:62px;display:flex}
+.tabbar div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;gap:2px}
+.tabbar i{font-style:normal;font-size:18px;line-height:1}
+.q{display:flex;gap:10px;align-items:center}
+.q img{width:52px;height:40px;object-fit:cover;flex:0 0 auto}
+.q .tx{flex:1;min-width:0}
+.q .nm{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q .sb{font-size:11px;opacity:.8}
+.pinw{position:relative}
+
+/* ============ 1. TOTK — Purah Pad ============ */
+.totk{background:#0b1416;color:#e9f3ea;font-family:"Noto Serif TC",serif}
+.totk #map .leaflet-tile-pane{filter:grayscale(1) sepia(.5) hue-rotate(120deg) saturate(.9) brightness(.5) contrast(1.25)}
+.totk .deco{inset:0;pointer-events:none;background:
+  radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(4,12,12,.85) 100%),
+  repeating-linear-gradient(0deg,rgba(120,255,220,.05) 0 1px,transparent 1px 48px),
+  repeating-linear-gradient(90deg,rgba(120,255,220,.05) 0 1px,transparent 1px 48px)}
+.totk .top{padding:14px 14px 10px;background:linear-gradient(#071012ee,#07101200)}
+.totk .top .t1{font-family:Cinzel,serif;letter-spacing:4px;font-size:11px;color:#c9b56b}
+.totk .top .t2{font-size:20px;font-weight:700;letter-spacing:1px;text-shadow:0 0 12px #3fe0c3aa}
+.totk .top .t3{font-size:11px;color:#9fd8cc;display:flex;gap:10px;margin-top:2px}
+.totk .top .t3 b{color:#ffd76a;font-weight:500}
+.totk .sheet{margin:0 10px;padding:10px 12px;background:rgba(6,16,18,.86);border:1px solid #c9b56b88;outline:1px solid #3fe0c344;outline-offset:-5px;border-radius:4px;box-shadow:0 0 24px #000a}
+.totk .sheet h4{margin:0 0 8px;font-family:Cinzel,"Noto Serif TC",serif;font-size:12px;letter-spacing:3px;color:#c9b56b;display:flex;justify-content:space-between}
+.totk .q{padding:6px 0;border-top:1px solid #3fe0c322}
+.totk .q img{border:1px solid #c9b56b66;filter:saturate(.7) sepia(.2)}
+.totk .q .no{width:20px;height:20px;transform:rotate(45deg);border:1px solid #3fe0c3;display:grid;place-items:center;font-size:10px;color:#3fe0c3;flex:0 0 auto}
+.totk .q .no span{transform:rotate(-45deg)}
+.totk .q.on .nm{color:#ffd76a}
+.totk .tag{font-size:10px;border:1px solid #e0574e;color:#ff8b7f;padding:0 5px;border-radius:2px;margin-left:4px}
+.totk .tabbar{background:#050c0d;border-top:1px solid #c9b56b55;color:#7fa69f}
+.totk .tabbar .on{color:#3fe0c3;text-shadow:0 0 10px #3fe0c3}
+.totk .pin{width:26px;height:26px;transform:rotate(45deg);background:#0b1b1d;border:2px solid #3fe0c3;box-shadow:0 0 12px #3fe0c3,inset 0 0 6px #3fe0c388;display:grid;place-items:center}
+.totk .pin span{transform:rotate(-45deg);color:#e9fff8;font:700 12px Cinzel,serif}
+.totk .pin.cur{border-color:#ffd76a;box-shadow:0 0 16px #ffd76a}
+.totk .pin.h{border-radius:50%;transform:none;border-color:#c9b56b}.totk .pin.h span{transform:none}
+
+/* ============ 2. Genshin — Teyvat map ============ */
+.gen{background:#ece5d8;color:#4a4237}
+.gen #map .leaflet-tile-pane{filter:sepia(.45) saturate(.85) brightness(1.04) contrast(.95)}
+.gen .deco{inset:0;pointer-events:none;box-shadow:inset 0 0 60px #c8b48a88}
+.gen .top{padding:12px;display:flex;gap:10px;align-items:center}
+.gen .top>div{flex:1;background:#3b4255e6;color:#ece5d8;border-radius:22px;padding:6px 14px;border:1px solid #d3bc8e}
+.gen .top .ic{width:44px;height:44px;border-radius:50%;background:#3b4255;border:3px solid #d3bc8e;display:grid;place-items:center;font-size:20px;color:#ece5d8;flex:0 0 auto}
+.gen .top .box{flex:1;background:#3b4255e6;color:#ece5d8;border-radius:22px;padding:6px 14px;border:1px solid #d3bc8e}
+.gen .top .t1{font-size:10px;color:#d3bc8e;letter-spacing:1px}
+.gen .top .t2{font-size:16px;font-weight:700}
+.gen .top .t3{display:none}
+.gen .sheet{margin:0 10px;background:#ece5d8f2;border-radius:14px;padding:10px 12px;border:2px solid #d3bc8e;box-shadow:0 4px 16px #0003}
+.gen .sheet h4{margin:0 0 6px;font-size:13px;color:#3b4255;display:flex;align-items:center;gap:6px}
+.gen .sheet h4:before{content:"";width:14px;height:14px;background:#d3bc8e;transform:rotate(45deg);display:inline-block}
+.gen .sheet h4 em{margin-left:auto;font-style:normal;font-size:11px;color:#a18f6a}
+.gen .q{padding:5px 6px;border-radius:10px;margin:2px 0}
+.gen .q.on{background:#fff8e8;box-shadow:inset 3px 0 0 #f0b35a}
+.gen .q img{border-radius:8px}
+.gen .q .no{display:none}
+.gen .q .sb:before{content:"★★★★ ";color:#e8b74a;letter-spacing:-1px}
+.gen .tag{font-size:10px;background:#c96a50;color:#fff;padding:0 6px;border-radius:8px;margin-left:4px}
+.gen .tabbar{background:#3b4255;color:#cfc6b3;border-top:2px solid #d3bc8e}
+.gen .tabbar .on{color:#ffd780}
+.gen .pin{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,#7fd4ff 0 35%,#2c5d8a 36% 60%,#ece5d8 61%);border:2px solid #d3bc8e;box-shadow:0 2px 6px #0006;display:grid;place-items:center}
+.gen .pin span{color:#fff;font:900 11px "Noto Sans TC";text-shadow:0 0 3px #036}
+.gen .pin.cur{transform:scale(1.2);box-shadow:0 0 0 4px #ffd78088,0 2px 6px #0006}
+.gen .pin.h{background:radial-gradient(circle,#ffd780 0 40%,#a8743a 41% 62%,#ece5d8 63%)}
+
+/* ============ 3. Elden Ring — Lands Between ============ */
+.eld{background:#0b0a08;color:#d8cba8;font-family:"Noto Serif TC",serif}
+.eld #map .leaflet-tile-pane{filter:grayscale(1) sepia(.9) brightness(.55) contrast(1.35)}
+.eld .deco{inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 42%,transparent 35%,#0b0a08 95%)}
+.eld .top{padding:22px 16px 10px;text-align:center;background:linear-gradient(#0b0a08,#0b0a0800)}
+.eld .top .t1{font-family:Cinzel,serif;font-size:10px;letter-spacing:6px;color:#8d7d55}
+.eld .top .t2{font-size:22px;font-weight:500;letter-spacing:6px;color:#e9dcb5}
+.eld .top .t3{font-size:11px;color:#8d7d55;letter-spacing:2px}
+.eld .top .t3 span+span:before{content:" ・ "}
+.eld .top:after{content:"";display:block;margin:8px auto 0;width:60%;height:1px;background:linear-gradient(90deg,transparent,#b39b5c,transparent)}
+.eld .sheet{margin:0;padding:12px 18px 8px;background:linear-gradient(#0b0a0800,#0b0a08 22%)}
+.eld .sheet h4{margin:0 0 6px;text-align:center;font-family:Cinzel,serif;letter-spacing:5px;font-size:11px;color:#8d7d55;font-weight:500}
+.eld .q{padding:6px 0;border-bottom:1px solid #2a251a}
+.eld .q img{display:none}
+.eld .q .no span{display:none}
+.eld .q .no{width:8px;height:8px;border-radius:50%;background:#5a4f35;flex:0 0 auto}
+.eld .q.on .no{background:#ffd56b;box-shadow:0 0 8px 3px #ffc84a}
+.eld .q.on .nm{color:#ffe7a6}
+.eld .q .nm{font-weight:500;font-size:15px;letter-spacing:1px}
+.eld .q .sb{color:#8d7d55}
+.eld .tag{font-size:10px;color:#c75b4a;margin-left:6px;letter-spacing:1px}
+.eld .tabbar{background:#0b0a08;color:#6e6247;border-top:1px solid #2a251a;font-family:Cinzel,"Noto Serif TC",serif}
+.eld .tabbar .on{color:#e9dcb5}
+.eld .pin{width:14px;height:14px;border-radius:50%;background:#ffe8a8;box-shadow:0 0 6px 2px #ffd56b,0 0 22px 8px #ffb84a66;position:relative;top:6px;left:6px}
+.eld .pin span{position:absolute;left:18px;top:-4px;font:500 12px Cinzel,serif;color:#e9dcb5;text-shadow:0 0 4px #000}
+.eld .pin.cur{box-shadow:0 0 8px 4px #ffd56b,0 0 34px 14px #ffb84a88}
+.eld .pin.h{background:#cfd8ff;box-shadow:0 0 6px 2px #9fb4ff,0 0 20px 8px #6f8cff55}
+
+/* ============ 4. Persona 5 — Phantom Thieves ============ */
+.p5{background:#000;color:#fff;font-family:"Noto Sans TC",sans-serif}
+.p5 #map .leaflet-tile-pane{filter:grayscale(1) contrast(1.8) brightness(1.1)}
+.p5 .deco{left:-40px;right:-40px;top:96px;height:30px;background:#000;transform:rotate(-6deg);pointer-events:none;opacity:.85}
+.p5 .top{padding:10px 12px 0}
+.p5 .top .t1{display:inline-block;background:#fff;color:#000;font:900 12px Anton,"Noto Sans TC";padding:2px 10px;transform:rotate(-4deg) skew(-10deg);letter-spacing:2px}
+.p5 .top .t2{font:400 46px/1 Anton,"Noto Sans TC";letter-spacing:1px;transform:rotate(-5deg);margin-top:4px;text-shadow:4px 4px 0 #e60012,-2px -2px 0 #000}
+.p5 .top .t2 small{font-size:22px;background:#e60012;padding:0 6px;margin-left:6px;vertical-align:middle}
+.p5 .top .t3{display:inline-block;margin-top:8px;background:#000;border:2px solid #fff;font-weight:900;font-size:14px;padding:3px 10px;transform:rotate(-3deg) skew(-8deg)}
+.p5 .top .t3 span+span{display:none}
+.p5 .sheet{margin:0 0 0 18px;padding:8px 10px 8px 14px}
+.p5 .sheet h4{margin:0 0 6px;font:400 22px Anton;letter-spacing:2px;color:#fff;transform:rotate(-3deg);text-shadow:3px 3px 0 #e60012}
+.p5 .q{background:#000;margin:6px 0;padding:6px 10px;transform:skew(-10deg) rotate(-1.5deg);border:2px solid #fff;box-shadow:5px 5px 0 #e60012}
+.p5 .q:nth-child(odd){transform:skew(-10deg) rotate(1deg);margin-left:10px}
+.p5 .q > *{transform:skew(10deg)}
+.p5 .q.on{background:#fff;color:#000;box-shadow:5px 5px 0 #000,8px 8px 0 #e60012}
+.p5 .q img{border:2px solid currentColor;width:46px;height:34px}
+.p5 .q .no{font:400 22px Anton;color:#e60012;width:26px;text-align:center}
+.p5 .q .nm{font-weight:900;font-size:15px}
+.p5 .tag{font-size:10px;background:#e60012;color:#fff;padding:0 5px;margin-left:4px;font-weight:900}
+.p5 .tabbar{background:#e60012;color:#000;font-weight:900}
+.p5 .tabbar div.on{background:#000;color:#fff;clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}
+.p5 .pin{width:34px;height:34px;background:#fff;clip-path:polygon(50% 0,61% 30%,95% 20%,72% 48%,100% 70%,65% 68%,58% 100%,42% 72%,8% 88%,30% 58%,0 35%,36% 34%);display:grid;place-items:center}
+.p5 .pin span{font:400 15px Anton;color:#000}
+.p5 .pin.cur{background:#ffe600;transform:scale(1.25) rotate(10deg)}
+.p5 .pin.h{background:#000;outline:2px solid #fff}.p5 .pin.h span{color:#fff}
+
+/* ============ 5. Animal Crossing — NookPhone ============ */
+.acnh{background:#f8f4e3;color:#5b4a3a;font-family:"Zen Maru Gothic","Noto Sans TC",sans-serif}
+.acnh #map .leaflet-tile-pane{filter:saturate(1.5) brightness(1.08) hue-rotate(-12deg) contrast(.9)}
+.acnh .deco{display:none}
+.acnh .top{padding:12px}
+.acnh .top>div{background:#fffdf3;border-radius:22px;padding:8px 14px;box-shadow:0 4px 0 #e0d6b8;display:inline-block}
+.acnh .top .t1{font-size:11px;color:#3fb5a0;font-weight:900}
+.acnh .top .t2{font-size:18px;font-weight:900}
+.acnh .top .t3{font-size:11px;color:#a08c6a}
+.acnh .top .t3 span+span:before{content:" ☀ "}
+.acnh .sheet{margin:0 12px;background:#fffdf3;border-radius:26px;padding:12px 14px;box-shadow:0 5px 0 #e0d6b8}
+.acnh .sheet h4{margin:-24px 0 6px;display:inline-block;background:#f5c84c;color:#5b4a3a;padding:4px 14px;border-radius:14px;font-size:13px;font-weight:900;transform:rotate(-3deg);box-shadow:0 3px 0 #d9a92b}
+.acnh .q{padding:5px 0}
+.acnh .q img{border-radius:12px}
+.acnh .q .no{width:26px;height:26px;border-radius:50%;background:#bfe9df;color:#2f8f80;display:grid;place-items:center;font-weight:900;font-size:12px;flex:0 0 auto}
+.acnh .q.on .no{background:#3fb5a0;color:#fff}
+.acnh .q.on{background:#fff4c9;border-radius:14px;padding:5px 6px}
+.acnh .tag{font-size:10px;background:#ff8c7a;color:#fff;padding:1px 7px;border-radius:9px;margin-left:4px}
+.acnh .tabbar{background:#fffdf3;color:#a08c6a;border-radius:24px 24px 0 0;box-shadow:0 -3px 0 #e0d6b8}
+.acnh .tabbar .on{color:#3fb5a0}
+.acnh .tabbar .on i{background:#3fb5a0;color:#fff;border-radius:14px;padding:4px 8px}
+.acnh .pin{width:34px;height:34px;border-radius:50% 50% 50% 8px;transform:rotate(-45deg);background:#fffdf3;border:3px solid #3fb5a0;display:grid;place-items:center;box-shadow:0 3px 0 #0002}
+.acnh .pin span{transform:rotate(45deg);font:900 13px "Zen Maru Gothic";color:#2f8f80}
+.acnh .pin.cur{background:#f5c84c;border-color:#d9a92b}.acnh .pin.cur span{color:#5b4a3a}
+.acnh .pin.h{border-color:#ff8c7a}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+  <div class="deco"></div>
+  <div class="top"><div>
+    <div class="t1" id="t1"></div>
+    <div class="t2" id="t2"></div>
+    <div class="t3" id="t3"></div>
+  </div></div>
+  <div class="sheet"><h4 id="h4"></h4><div id="list"></div></div>
+  <div class="tabbar" id="tabbar"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const theme=(new URLSearchParams(location.search).get('t')||'totk');
+document.body.className=theme;
+const qw=new URLSearchParams(location.search).get('w');if(qw)document.documentElement.style.setProperty('--w',qw+'px');
+const W='https://thumb.wikimedia.org/wikipedia/commons/thumb/';
+const STOPS=[
+ {n:'羅馬競技場',t:'08:30',ll:[41.89021,12.49223],img:W+'d/de/Colosseo_2020.jpg/500px-Colosseo_2020.jpg',must:1},
+ {n:'古羅馬廣場＋帕拉丁丘',t:'10:30',ll:[41.89250,12.48530],img:W+'6/6a/Foro_Romano_Musei_Capitolini_Roma.jpg/500px-Foro_Romano_Musei_Capitolini_Roma.jpg',must:1},
+ {n:'帝國廣場大道',t:'13:00',ll:[41.89276,12.48800],img:W+'d/d6/063ViaForiImperiali.jpg/500px-063ViaForiImperiali.jpg'},
+ {n:'威尼斯廣場・紀念堂',t:'14:00',ll:[41.89599,12.48246],img:W+'1/1d/Vittoriano_Altare_della_Patria_2013-09-16.jpg/500px-Vittoriano_Altare_della_Patria_2013-09-16.jpg'},
+ {n:'馬切羅劇場',t:'15:30',ll:[41.89193,12.47991],img:W+'a/a2/Teatro_di_Marcello_intero.jpg/500px-Teatro_di_Marcello_intero.jpg'},
+ {n:'真理之口',t:'16:15',ll:[41.88824,12.48144],img:W+'7/7b/Et%C3%A0_imperiale%2C_chiusino_a_forma_di_mascherone_di_divinit%C3%A0_fluviale%2C_detta_bocca_della_verit%C3%A0%2C_collocata_qui_nel_1632.jpg/500px-Et%C3%A0_imperiale%2C_chiusino_a_forma_di_mascherone_di_divinit%C3%A0_fluviale%2C_detta_bocca_della_verit%C3%A0%2C_collocata_qui_nel_1632.jpg'}
+];
+const HOTEL={n:'69 Suite',ll:[41.89928,12.49122]};
+const TH={
+ totk:{t1:'ROMA ・ DAY 10',t2:'古羅馬一日',t3:['<span>2/8 MON</span>','<span>☀ <b>11°C</b></span>','<span>🌅 17:33</span>'],h4:['ADVENTURE LOG','主線任務'],tabs:[['◈','地圖'],['📜','冒險日誌'],['❖','圖鑑'],['⚑','預約'],['☾','夜遊']],line:{color:'#3fe0c3',weight:3,dashArray:'1 7',lineCap:'round'},glow:{color:'#3fe0c3',weight:10,opacity:.18}},
+ gen:{t1:'羅馬・魔神任務',t2:'第十幕　古羅馬一日',t3:[],h4:['任務追蹤','6 / 6'],tabs:[['🗺','地圖'],['📖','任務'],['🌟','景點'],['🎫','預約'],['🌙','夜遊']],line:{color:'#c49b4f',weight:4,dashArray:'8 6'},glow:{color:'#fff',weight:8,opacity:.6}},
+ eld:{t1:'THE  ETERNAL  CITY',t2:'羅　馬',t3:['<span>第十日</span>','<span>二月八日</span>'],h4:['SITES  OF  GRACE',''],tabs:[['','地圖'],['','行程'],['','景點'],['','預約'],['','夜遊']],line:{color:'#ffd56b',weight:1.5,opacity:.6,dashArray:'2 6'},glow:null},
+ p5:{t1:'DAY 10',t2:'2/8<small>MON</small>',t3:['<span>古羅馬一日 ─ TAKE YOUR TIME</span>','<span></span>'],h4:['TODAY\'S TARGETS',''],tabs:[['','MAP'],['','PLAN'],['','SPOTS'],['','BOOK'],['','NIGHT']],line:{color:'#000',weight:6},glow:{color:'#fff',weight:12,opacity:1}},
+ acnh:{t1:'🍃 羅馬・第 10 天',t2:'今天去古羅馬玩！',t3:['<span>2/8（一）</span>','<span>11°C</span>'],h4:['今日待辦',''],tabs:[['🗺️','地圖'],['📅','行程'],['📷','景點'],['🎟️','預約'],['🌙','夜遊']],line:{color:'#fff',weight:5,dashArray:'0.1 10',lineCap:'round'},glow:{color:'#3fb5a0',weight:9,opacity:.5}}
+}[theme];
+document.getElementById('t1').innerHTML=TH.t1;
+document.getElementById('t2').innerHTML=TH.t2;
+document.getElementById('t3').innerHTML=TH.t3.join('');
+document.getElementById('h4').innerHTML=TH.h4[0]+(TH.h4[1]?`<em>${TH.h4[1]}</em>`:'');
+document.getElementById('tabbar').innerHTML=TH.tabs.map(([i,l],k)=>`<div class="${k?'':'on'}">${i?`<i>${i}</i>`:''}${l}</div>`).join('');
+const cur=0;
+document.getElementById('list').innerHTML=STOPS.slice(0,4).map((s,i)=>`<div class="q${i===cur?' on':''}"><div class="no"><span>${i+1}</span></div><img src="${s.img}" alt=""><div class="tx"><div class="nm">${s.n}${s.must?'<span class="tag">預約</span>':''}</div><div class="sb">${s.t}</div></div></div>`).join('');
+const map=L.map('map',{zoomControl:false,attributionControl:true}).setView([41.8915,12.4865],15);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+const ll=STOPS.map(s=>s.ll);
+if(theme==='p5'){const tp=map.createPane('tint');tp.style.zIndex=250;tp.style.mixBlendMode='multiply';L.rectangle([[41,11.5],[43,13.5]],{pane:'tint',stroke:false,fillColor:'#e60012',fillOpacity:1,interactive:false}).addTo(map);}
+if(TH.glow)L.polyline(ll,TH.glow).addTo(map);
+L.polyline(ll,TH.line).addTo(map);
+STOPS.forEach((s,i)=>L.marker(s.ll,{icon:L.divIcon({className:'',iconSize:[30,30],iconAnchor:[15,15],html:`<div class="pin${i===cur?' cur':''}"><span>${i+1}</span></div>`})}).addTo(map));
+L.marker(HOTEL.ll,{icon:L.divIcon({className:'',iconSize:[30,30],iconAnchor:[15,15],html:`<div class="pin h"><span>H</span></div>`})}).addTo(map);
+map.fitBounds(L.latLngBounds(ll.concat([HOTEL.ll])),{paddingTopLeft:[20,120],paddingBottomRight:[20,330]});
+</script>
+</body>
+</html>
