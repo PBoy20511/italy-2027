@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>風格畫面預覽</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Serif+TC:wght@700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+#app{position:relative;width:var(--w,100vw);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.scroll{flex:1;overflow:hidden;padding:0 12px}
+.tabbar{height:62px;display:flex;flex:0 0 auto}
+.tabbar div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;gap:2px}
+.tabbar i{font-style:normal;font-size:18px;line-height:1}
+img{display:block}
+
+/* ================= Genshin ================= */
+.gen{background:#ece5d8;color:#4a4237;font-family:"Noto Sans TC",sans-serif}
+.gen #app{background:#ece5d8 radial-gradient(ellipse at top,#f6f1e7,#e3d9c6)}
+.gen .hd{padding:16px 14px 10px;display:flex;align-items:center;gap:10px}
+.gen .hd .ic{width:40px;height:40px;border-radius:50%;background:#3b4255;border:3px solid #d3bc8e;display:grid;place-items:center;color:#ffd780;font-size:18px}
+.gen .hd .t1{font-size:11px;color:#a18f6a;letter-spacing:1px}
+.gen .hd .t2{font:900 20px "Noto Serif TC",serif;color:#3b4255}
+.gen .tabs2{display:flex;gap:6px;padding:0 12px 10px}
+.gen .tabs2 span{font-size:12px;padding:4px 12px;border-radius:14px;background:#d8ccb4;color:#6b5d45}
+.gen .tabs2 span.on{background:#3b4255;color:#ffd780}
+.gen .chap{margin:8px 0 4px;display:flex;align-items:center;gap:8px;font:700 13px "Noto Serif TC";color:#8a7650}
+.gen .chap:before,.gen .chap:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#c8b48a,transparent)}
+.gen .day{background:#f7f2e8;border:1px solid #d3bc8e;border-radius:12px;padding:8px 10px;margin:6px 0;display:flex;gap:10px;align-items:center;box-shadow:0 2px 0 #d8ccb4}
+.gen .day.on{background:#fff;border-color:#f0b35a;box-shadow:0 0 0 2px #f0b35a55,0 2px 0 #d8ccb4}
+.gen .day .dt{width:46px;text-align:center;flex:0 0 auto}
+.gen .day .dt b{display:block;font:900 18px "Noto Serif TC";color:#3b4255;line-height:1.1}
+.gen .day .dt small{font-size:10px;color:#a18f6a}
+.gen .day .tx{flex:1;min-width:0}
+.gen .day .nm{font-weight:700;font-size:14px}
+.gen .day .sb{font-size:11px;color:#8a7650}
+.gen .day img{width:54px;height:40px;object-fit:cover;border-radius:8px}
+.gen .day .st{font-size:10px;color:#fff;background:#6fa36b;border-radius:8px;padding:1px 6px;margin-left:4px}
+.gen .day .st.n{background:#c96a50}
+.gen .hero{margin:0 -12px;height:250px;position:relative}
+.gen .hero img{width:100%;height:100%;object-fit:cover}
+.gen .hero:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,#ece5d8)}
+.gen .hero .bk{position:absolute;left:12px;top:14px;z-index:2;width:36px;height:36px;border-radius:50%;background:#3b4255cc;color:#ece5d8;display:grid;place-items:center;border:2px solid #d3bc8e}
+.gen .card{background:#f7f2e8;border:2px solid #d3bc8e;border-radius:14px;padding:12px 14px;margin-top:-60px;position:relative;z-index:2;box-shadow:0 4px 14px #0002}
+.gen .card .ttl{font:900 22px "Noto Serif TC";color:#3b4255}
+.gen .card .it{font-size:11px;color:#a18f6a}
+.gen .card .stars{color:#e8b74a;font-size:16px;letter-spacing:1px}
+.gen .badges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.gen .badges span{font-size:11px;border-radius:10px;padding:2px 9px;background:#e3d9c6;color:#6b5d45}
+.gen .badges .must{background:#c96a50;color:#fff}
+.gen .badges .mine{background:#3b4255;color:#ffd780}
+.gen .desc{font-size:13px;line-height:1.6}
+.gen .kv{display:grid;grid-template-columns:3.5em 1fr;gap:4px 8px;font-size:12px;margin-top:8px;padding-top:8px;border-top:1px dashed #d3bc8e}
+.gen .kv dt{color:#a18f6a}.gen .kv dd{margin:0}
+.gen .btns{display:flex;gap:8px;margin-top:12px}
+.gen .btns a{flex:1;text-align:center;padding:9px 0;border-radius:20px;font-size:13px;font-weight:700;background:#ece5d8;border:1px solid #d3bc8e;color:#4a4237;text-decoration:none}
+.gen .btns a.p{background:#3b4255;color:#ffd780;border-color:#3b4255}
+.gen .tabbar{background:#3b4255;color:#cfc6b3;border-top:2px solid #d3bc8e}
+.gen .tabbar .on{color:#ffd780}
+
+/* ================= ACNH ================= */
+.acnh{background:#f8f4e3;color:#5b4a3a;font-family:"Zen Maru Gothic","Noto Sans TC",sans-serif}
+.acnh #app{background:#f8f4e3 radial-gradient(circle at 20px 20px,#efe8cf 3px,transparent 4px) 0 0/28px 28px}
+.acnh .hd{padding:16px 14px 8px}
+.acnh .hd .t1{display:inline-block;background:#3fb5a0;color:#fff;font-size:11px;font-weight:900;padding:2px 10px;border-radius:10px}
+.acnh .hd .t2{font-size:22px;font-weight:900;margin-top:4px}
+.acnh .tabs2{display:flex;gap:6px;padding:0 12px 10px}
+.acnh .tabs2 span{font-size:12px;font-weight:700;padding:5px 12px;border-radius:16px;background:#fffdf3;color:#a08c6a;box-shadow:0 3px 0 #e0d6b8}
+.acnh .tabs2 span.on{background:#f5c84c;color:#5b4a3a;box-shadow:0 3px 0 #d9a92b}
+.acnh .chap{margin:10px 2px 4px;font-weight:900;font-size:13px;color:#3fb5a0}
+.acnh .day{background:#fffdf3;border-radius:20px;padding:8px 10px;margin:8px 0;display:flex;gap:10px;align-items:center;box-shadow:0 4px 0 #e0d6b8}
+.acnh .day.on{background:#fff4c9;box-shadow:0 4px 0 #e8cf7a}
+.acnh .day .dt{width:46px;height:46px;border-radius:14px;background:#bfe9df;color:#2f8f80;text-align:center;flex:0 0 auto;display:flex;flex-direction:column;justify-content:center}
+.acnh .day.on .dt{background:#3fb5a0;color:#fff}
+.acnh .day .dt b{font-size:16px;line-height:1}
+.acnh .day .dt small{font-size:10px}
+.acnh .day .tx{flex:1;min-width:0}
+.acnh .day .nm{font-weight:900;font-size:14px}
+.acnh .day .sb{font-size:11px;color:#a08c6a}
+.acnh .day img{width:50px;height:50px;object-fit:cover;border-radius:16px}
+.acnh .day .st{font-size:10px;color:#fff;background:#8bc96b;border-radius:9px;padding:1px 7px;margin-left:4px}
+.acnh .day .st.n{background:#ff8c7a}
+.acnh .hero{margin:6px 0 0;height:230px;border-radius:28px;overflow:hidden;position:relative;border:5px solid #fffdf3;box-shadow:0 5px 0 #e0d6b8}
+.acnh .hero img{width:100%;height:100%;object-fit:cover}
+.acnh .hero .bk{position:absolute;left:10px;top:10px;width:36px;height:36px;border-radius:50%;background:#fffdf3;display:grid;place-items:center;font-weight:900;color:#3fb5a0}
+.acnh .card{background:#fffdf3;border-radius:26px;padding:16px 14px 14px;margin-top:14px;position:relative;box-shadow:0 5px 0 #e0d6b8}
+.acnh .card .ttl{font-size:22px;font-weight:900}
+.acnh .card .tagtop{position:absolute;top:-12px;left:16px;background:#f5c84c;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:900;transform:rotate(-3deg);box-shadow:0 3px 0 #d9a92b}
+.acnh .card .it{font-size:11px;color:#a08c6a}
+.acnh .card .stars{display:none}
+.acnh .badges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.acnh .badges span{font-size:11px;font-weight:700;border-radius:10px;padding:2px 9px;background:#bfe9df;color:#2f8f80}
+.acnh .badges .must{background:#ff8c7a;color:#fff}
+.acnh .badges .mine{background:#ffd6e0;color:#c2577a}
+.acnh .desc{font-size:13px;line-height:1.65}
+.acnh .kv{display:grid;grid-template-columns:3.5em 1fr;gap:4px 8px;font-size:12px;margin-top:8px;padding:8px 10px;background:#f8f4e3;border-radius:14px}
+.acnh .kv dt{color:#a08c6a;font-weight:700}.acnh .kv dd{margin:0}
+.acnh .btns{display:flex;gap:8px;margin-top:12px}
+.acnh .btns a{flex:1;text-align:center;padding:9px 0;border-radius:20px;font-size:13px;font-weight:900;background:#fffdf3;color:#5b4a3a;text-decoration:none;box-shadow:0 3px 0 #e0d6b8;border:2px solid #efe6cc}
+.acnh .btns a.p{background:#3fb5a0;color:#fff;border-color:#3fb5a0;box-shadow:0 3px 0 #2f8f80}
+.acnh .tabbar{background:#fffdf3;color:#a08c6a;border-radius:24px 24px 0 0;box-shadow:0 -3px 0 #e0d6b8}
+.acnh .tabbar .on{color:#3fb5a0}
+.acnh .tabbar .on i{background:#3fb5a0;color:#fff;border-radius:14px;padding:4px 8px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const P=new URLSearchParams(location.search);
+const theme=P.get('t')||'gen', scr=P.get('s')||'plan';
+document.body.className=theme;
+if(P.get('w'))document.documentElement.style.setProperty('--w',P.get('w')+'px');
+const W='https://thumb.wikimedia.org/wikipedia/commons/thumb/';
+const I={
+ rialto:W+'3/3b/Rialto_2025_4.jpg/500px-Rialto_2025_4.jpg',
+ colosseo:W+'d/de/Colosseo_2020.jpg/500px-Colosseo_2020.jpg',
+ vatican:null,
+ trevi:'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Trevi_Fountain_-_Roma.jpg/500px-Trevi_Fountain_-_Roma.jpg'
+};
+const G=theme==='gen';
+const tabs=G?[['🗺','地圖'],['📖','任務'],['🌟','景點'],['🎫','預約'],['🌙','夜遊']]:[['🗺️','地圖'],['📅','行程'],['📷','景點'],['🎟️','預約'],['🌙','夜遊']];
+const onTab=scr==='plan'?1:2;
+const tabbar=`<div class="tabbar">${tabs.map(([i,l],k)=>`<div class="${k===onTab?'on':''}"><i>${i}</i>${l}</div>`).join('')}</div>`;
+const DAYS=[
+ ['2/7','日','火車 → 羅馬・許願池夜景','佛羅倫斯 13:43 → 羅馬',I.trevi,'夜遊'],
+ ['2/8','一','古羅馬一日','競技場・古羅馬廣場・真理之口',I.colosseo,'預約'],
+ ['2/9','二','梵蒂岡','博物館・聖彼得大教堂','https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Vatican_Museums_Spiral_Staircase_Looking_Up_2012.jpg/500px-Vatican_Museums_Spiral_Staircase_Looking_Up_2012.jpg','預約'],
+ ['2/10','三','歷史中心步行','萬神殿・聖依納爵・納沃納','https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Pantheon_%28Rome%29_-_Right_side_and_front.jpg/500px-Pantheon_%28Rome%29_-_Right_side_and_front.jpg',''],
+ ['2/11','四','博爾蓋塞＋公園夕陽','博爾蓋塞美術館・平喬山','https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Apollo_and_Daphne_%28Bernini%29_%28cropped%29.jpg/500px-Apollo_and_Daphne_%28Bernini%29_%28cropped%29.jpg','預約']
+];
+let html='';
+if(scr==='plan'){
+ html=`<div class="hd">${G?'<div style="display:flex;gap:10px;align-items:center"><div class="ic">✦</div><div><div class="t1">任務一覽・魔神任務</div><div class="t2">第三章　永恆之城</div></div></div>':'<div class="t1">📅 行程</div><div class="t2">羅馬篇・7 天</div>'}</div>
+ <div class="tabs2"><span>威尼斯</span><span>佛羅倫斯</span><span class="on">羅馬</span></div>
+ <div class="scroll"><div class="chap">${G?'第三章・羅馬':'🏛️ 羅馬（2/7 – 2/14）'}</div>
+ ${DAYS.map((d,i)=>`<div class="day${i===1?' on':''}"><div class="dt"><b>${d[0]}</b><small>${G?'週':'('}${d[1]}${G?'':')'}</small></div>
+  <div class="tx"><div class="nm">${G?`第 ${i+9} 幕　`:''}${d[2]}${d[5]?`<span class="st${d[5]==='預約'?' n':''}">${d[5]}</span>`:''}</div><div class="sb">${d[3]}</div></div>
+  ${d[4]?`<img src="${d[4]}" alt="">`:''}</div>`).join('')}</div>`;
+}else{
+ html=`<div class="scroll" style="padding-top:${G?0:10}px">
+  <div class="hero"><img src="${I.trevi}" alt=""><div class="bk">‹</div></div>
+  <div class="card">${G?'':'<div class="tagtop">📍 羅馬</div>'}
+   <div class="ttl">許願池</div><div class="it">Fontana di Trevi</div>
+   <div class="stars">★★★★★</div>
+   <div class="badges"><span class="mine">${G?'✦ 必去':'🩷 我們想去'}</span><span>免預約</span><span>2/7・2/10</span></div>
+   <div class="desc">2026/2/2 起靠近水池那一圈要 <b>€2</b>；站在廣場外圍看、拍照都免費。想沒人：早上 7–8 點或 22:00 後。</div>
+   <dl class="kv"><dt>票價</dt><dd>池邊 €2・外圍免費</dd><dt>時間</dt><dd>收費 9:00–22:00</dd><dt>夜遊</dt><dd>2/7 抵達夜路線</dd></dl>
+   <div class="btns"><a class="p">導航</a><a>地圖</a><a>官網</a></div>
+  </div></div>`;
+}
+document.getElementById('app').innerHTML=html+tabbar;
+</script>
+</body>
+</html>
