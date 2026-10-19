@@ -138,6 +138,38 @@ th{color:var(--sub);font-weight:700}
 .lv.g{background:#6cc3a0}.lv.y{background:#f2b33d}.lv.r{background:#ff7a66}
 .clock{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;font-size:11px;text-align:center;color:#fff;margin:8px 0;font-weight:700}
 .clock div{padding:6px 0;border-radius:10px}
+
+/* ===== declutter for phones ===== */
+header{padding:8px 12px 2px;padding-top:max(8px,env(safe-area-inset-top))}
+.banner{padding:6px 10px 6px 6px;gap:10px;border-radius:20px;border-width:1.5px}
+.emblem{width:38px;height:38px;font-size:15px;border-width:2px;box-shadow:none}
+header h1{font-size:17px}
+header .kick{font-size:10px;letter-spacing:.5px}
+header .meta{display:none}
+.banner #today{margin:0 0 0 auto;padding:4px 10px;font-size:12px;border-radius:12px;box-shadow:0 2px 0 var(--sun-d);white-space:nowrap}
+main{padding:4px 14px 100px}
+.card{border:0;box-shadow:0 3px 0 #ece2c6,0 8px 18px rgba(120,100,60,.06);margin:10px 0;border-radius:20px}
+h2{margin:16px 0 6px;font-size:17px}
+.chips{padding:2px 2px 8px}
+.chip{padding:5px 11px;font-size:12.5px}
+.chip.sep{width:2px;padding:0;background:var(--line);box-shadow:none;margin:4px 2px}
+#map{height:calc(100dvh - 205px);min-height:360px;border-width:4px;border-radius:24px}
+details.fold>summary{list-style:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+details.fold>summary::-webkit-details-marker{display:none}
+.sumrow{display:flex;align-items:center;gap:10px}
+.sumrow>div:first-child{flex:1;min-width:0}
+.thumbs{display:flex;gap:5px;margin-top:8px;overflow:hidden}
+.thumbs img{width:42px;height:42px;border-radius:12px;object-fit:cover;border:2px solid #fff;box-shadow:0 2px 0 #e6dcbf;flex:0 0 auto}
+.chev{width:28px;height:28px;border-radius:50%;background:var(--bg);display:grid;place-items:center;color:var(--sub);font-size:12px;transition:transform .2s;flex:0 0 auto}
+details[open]>summary .chev{transform:rotate(180deg)}
+details.fold[open]>summary{margin-bottom:6px}
+.srow{display:flex;gap:12px;align-items:center}
+.srow>img,.srow>.noimg{width:62px;height:62px;border-radius:16px;object-fit:cover;flex:0 0 auto;background:var(--brand2);display:grid;place-items:center;font-size:24px}
+.srow .tx{flex:1;min-width:0}
+.srow .nm2{font:900 15px var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow .meta2{font-size:11.5px;color:var(--sub);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.spot .ph{margin:4px 0 10px;border-radius:16px;border:0;aspect-ratio:2/1}
+.tl li{padding-bottom:10px}
 </style>
 </head>
 <body>
@@ -145,8 +177,7 @@ th{color:var(--sub);font-weight:700}
   <div class="banner"><div class="emblem">🇮🇹</div><div>
     <div class="kick">大寶小寶的冒險・2027</div>
     <h1>義大利之旅</h1>
-    <div class="meta">1/29 – 2/15・威尼斯 → 佛羅倫斯 → 羅馬</div></div></div>
-  <div id="today"></div>
+    <div class="meta">1/29 – 2/15・威尼斯 → 佛羅倫斯 → 羅馬</div></div><div id="today"></div></div>
 </header>
 <nav id="tabs">
   <button data-t="map" class="on"><i>🗺️</i>地圖</button>
@@ -154,26 +185,13 @@ th{color:var(--sub);font-weight:700}
   <button data-t="night"><i>🌙</i>夜遊</button>
   <button data-t="spots"><i>📷</i>景點</button>
   <button data-t="book"><i>🎫</i>預約</button>
-  <button data-t="stay"><i>🏨</i>住宿</button>
-  <button data-t="tips"><i>💡</i>實用</button>
+  <button data-t="info"><i>🧳</i>資訊</button>
 </nav>
 <main>
 
 <section id="s-map" class="on">
-  <div class="strip">
-    <div style="flex:4;background:var(--ve)"><b>威尼斯</b>1/29–2/2</div>
-    <div style="flex:5;background:var(--fi)"><b>佛羅倫斯</b>2/2–2/7</div>
-    <div style="flex:7;background:var(--ro)"><b>羅馬</b>2/7–2/14</div>
-  </div>
-  <div class="chips" id="cityChips"></div>
-  <div class="chips" id="dayChips"></div>
+  <div class="chips"><span id="cityChips" style="display:contents"></span><i class="chip sep"></i><span id="dayChips" style="display:contents"></span></div>
   <div id="map"></div>
-  <div class="legend">
-    <span><i class="dot" style="background:var(--ve)"></i>威尼斯</span>
-    <span><i class="dot" style="background:var(--fi)"></i>佛羅倫斯</span>
-    <span><i class="dot" style="background:var(--ro)"></i>羅馬</span>
-    <span>■ 方形＝飯店</span><span>數字＝當天順序</span>
-  </div>
   <div id="mapDay"></div>
 </section>
 
@@ -186,7 +204,7 @@ th{color:var(--sub);font-weight:700}
 
 <section id="s-night">
   <h2>🌙 夜遊路線</h2>
-  <div class="card small">二月下午 5 點半就天黑，晚上才是看夜景的時間。路線都走<b>有燈、有人的大路</b>，起點或終點就是飯店。點「看路線」會在地圖上畫出來。</div>
+  <div class="small" style="margin:-2px 2px 4px">路線都走有燈、有人的大路，點開看每一站。</div>
   <div id="nightList"></div>
   <h2>🛡️ 晚上大概到幾點都安心？</h2>
   <div id="safety"></div>
@@ -438,10 +456,11 @@ function renderNight(){
     const d=D[x.day];
     const items=x.s.map(([id,tm,note],j)=>`<li><span class="n">${j+1}</span>${thumb(id)}<div class="tm">${esc(tm)}</div>
       <div class="w"><a href="#" onclick="openSpot('${id}');return false" style="color:inherit;text-decoration:none">${esc(S[id].n)}</a></div>${note?`<div class="note">${esc(note)}</div>`:''}</li>`).join('');
-    return `<div class="card night" id="night${i}"><div class="dh"><span class="dn" style="color:${C[x.c]}">${CITY[x.c]}</span>
-      <span class="dt">🌙 ${d.d}（${d.w}）</span><span class="theme">${esc(x.t)}・${esc(x.km)}</span></div><ul class="tl">${items}</ul>
+    const th=[...new Set(x.s.map(y=>y[0]))].filter(id=>IMG[id]&&!S[id].hotel).slice(0,5).map(id=>`<img loading="lazy" src="${IMG[id].img}" alt="">`).join('');
+    return `<details class="card night fold" id="night${i}"><summary><div class="sumrow"><div><div class="dh"><span class="dn" style="background:${C[x.c]}">${CITY[x.c]}</span>
+      <span class="dt">🌙 ${d.d}（${d.w}）</span><span class="theme">${esc(x.t)}・${esc(x.km)}</span></div><div class="thumbs">${th}</div></div><span class="chev">▼</span></div></summary><ul class="tl">${items}</ul>
       <div class="btnrow"><a class="btn p" href="#" onclick="show('map');drawNight(${i});return false">🗺️ 看路線</a>
-      <a class="btn" target="_blank" href="https://www.google.com/maps/dir/${x.s.map(([id])=>S[id].ll.join(',')).join('/')}/data=!4m2!4m1!3e2">Google 步行路線</a></div></div>`;
+      <a class="btn" target="_blank" href="https://www.google.com/maps/dir/${x.s.map(([id])=>S[id].ll.join(',')).join('/')}/data=!4m2!4m1!3e2">Google 步行路線</a></div></details>`;
   }).join('');
   const clock=`<div class="clock"><div style="background:#6cc3a0">17:30<br>天黑</div><div style="background:#6cc3a0">19:00</div><div style="background:#6cc3a0">21:00</div><div style="background:#6cc3a0">22:00</div><div style="background:#f2b33d">23:00<br>回飯店</div><div style="background:#ff7a66">00:00 後<br>計程車</div></div>`;
   $('#safety').innerHTML=`<div class="card">${clock}
@@ -480,8 +499,9 @@ const dateOf=s=>{const[m,d]=s.split('/').map(Number);return new Date(year,m-1,d)
 
 /* tabs */
 function show(t){
+  if(t==='stay'||t==='tips')t='info';
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
-  document.querySelectorAll('main section').forEach(s=>s.classList.toggle('on',s.id==='s-'+t));
+  document.querySelectorAll('main section').forEach(s=>s.classList.toggle('on',s.id==='s-'+t||(t==='info'&&(s.id==='s-stay'||s.id==='s-tips'))));
   if(t==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
   window.scrollTo(0,0);store.set('tab',t);
 }
@@ -508,18 +528,18 @@ const VIEWS={
  ro:{b:[[41.915,12.452],[41.886,12.505]]}
 };
 function initMap(){
-  map=L.map('map',{zoomControl:true,tap:true,scrollWheelZoom:false});
+  map=L.map('map',{zoomControl:false,tap:true,scrollWheelZoom:false});
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
   layer=L.layerGroup().addTo(map);
   const cc=$('#cityChips');
-  [['all','🇮🇹 全程'],['ve','威尼斯'],['fi','佛羅倫斯'],['ro','羅馬']].forEach(([k,l])=>{
+  [['all','🗺️ 全程'],['ve','威尼斯'],['fi','佛羅倫斯'],['ro','羅馬']].forEach(([k,l])=>{
     const b=document.createElement('button');b.className='chip';b.textContent=l;b.dataset.k=k;
     b.onclick=()=>drawCity(k);cc.appendChild(b);
   });
   const dc=$('#dayChips');
   D.forEach((x,i)=>{const b=document.createElement('button');b.className='chip';b.dataset.i=i;
-    b.innerHTML=`<i class="dot" style="background:${C[x.c]}"></i>${x.d}（${x.w}）`;b.onclick=()=>drawDay(i);dc.appendChild(b)});
+    b.innerHTML=`<i class="dot" style="background:${C[x.c]}"></i>${x.d}`;b.onclick=()=>drawDay(i);dc.appendChild(b)});
 }
 function setChips(city,day){
   document.querySelectorAll('#cityChips .chip').forEach(b=>b.classList.toggle('on',b.dataset.k===city));
@@ -566,39 +586,44 @@ function dayCard(i,compact){
     ${S[id].b!=='free'?`<span class="badge ${BADGE[S[id].b][1]}" style="font-size:10px;padding:1px 6px">${BADGE[S[id].b][0]}</span>`:''}</div>
     ${note?`<div class="note">${esc(note)}</div>`:''}</li>`).join('');
   const gm='https://www.google.com/maps/dir/'+x.s.map(([id])=>S[id].ll.join(',')).join('/');
-  return `<div class="card day"${compact?'':` id="day${i}"`} style="--c:${col}">
-    <div class="dh"><span class="dn">第 ${i+1} 幕・${CITY[x.c]}</span><span class="dt">${x.d}（${x.w}）</span><span class="theme">${esc(x.t)}</span></div>
+  const th=[...new Set(x.s.filter(y=>!y[3]).map(y=>y[0]))].filter(id=>IMG[id]).slice(0,5).map(id=>`<img loading="lazy" src="${IMG[id].img}" alt="">`).join('');
+  const open=(!compact&&i===todayIndex())?' open':'';
+  return `<details class="card day fold"${compact?'':` id="day${i}"`}${open} style="--c:${col}"><summary>
+    <div class="sumrow"><div><div class="dh"><span class="dn">第 ${i+1} 幕・${CITY[x.c]}</span><span class="dt">${x.d}（${x.w}）</span><span class="theme">${esc(x.t)}</span></div>
+    <div class="thumbs">${th}</div></div><span class="chev">▼</span></div></summary>
     <ul class="tl">${items}</ul>
     ${x.warn?`<div class="warn">⚠ ${esc(x.warn)}</div>`:''}
-    ${N.map((n,k)=>n.day===i?`<div class="warn" style="background:#e9ebff;color:#4b558f">🌙 晚上：<a href="#" onclick="show('night');setTimeout(()=>document.getElementById('night${k}').scrollIntoView(),60);return false">${esc(n.t)}</a></div>`:'').join('')}
+    ${N.map((n,k)=>n.day===i?`<div class="warn" style="background:#e9ebff;color:#4b558f">🌙 晚上：<a href="#" onclick="show('night');setTimeout(()=>{const e=document.getElementById('night${k}');e.open=true;e.scrollIntoView()},60);return false">${esc(n.t)}</a></div>`:'').join('')}
     <div class="btnrow">${compact?'':`<a class="btn p" href="#" onclick="show('map');drawDay(${i});return false">🗺️ 看路線</a>`}
-    <a class="btn" target="_blank" href="${gm}">Google 地圖整天路線</a></div></div>`;
+    <a class="btn" target="_blank" href="${gm}">Google 地圖整天路線</a></div></details>`;
 }
 function renderPlan(){
   const cal=$('#cal');
   cal.innerHTML='日一二三四五六'.split('').map(w=>`<div class="h">${w}</div>`).join('');
   const first=dateOf('1/29').getDay();
   for(let k=0;k<first;k++)cal.innerHTML+='<div class="d x"></div>';
-  D.forEach((x,i)=>{cal.innerHTML+=`<div class="d" style="background:${C[x.c]}" onclick="document.getElementById('day${i}').scrollIntoView({behavior:'smooth'})">${x.d}<small>${esc(x.t.split(/[・：→]/)[0].slice(0,6))}</small></div>`});
+  D.forEach((x,i)=>{cal.innerHTML+=`<div class="d" style="background:${C[x.c]}" onclick="openDay(${i})">${x.d}<small>${esc(x.t.split(/[・：→]/)[0].slice(0,6))}</small></div>`});
   cal.innerHTML+=`<div class="d" style="background:#a08c6a">2/15<small>抵台 20:40</small></div>`;
   const CH={0:'第一章・水都威尼斯',4:'第二章・花之城佛羅倫斯',9:'第三章・永恆之城羅馬'};
   $('#days').innerHTML=D.map((x,i)=>(CH[i]?`<div class="chapter"><span>${CH[i]}</span></div>`:'')+dayCard(i)).join('');
 }
 
+function openDay(i){const el=document.getElementById('day'+i);if(!el)return;el.open=true;el.scrollIntoView({behavior:'smooth',block:'start'})}
 /* ---------- spots ---------- */
 let spotFilter='all';
 function spotCard(id){
   const s=S[id];const b=BADGE[s.b];
-  const days=D.map((x,i)=>x.s.some(y=>y[0]===id)?`<a href="#" onclick="show('plan');setTimeout(()=>document.getElementById('day${i}').scrollIntoView(),60);return false">${x.d}</a>`:'').filter(Boolean);
+  const days=D.map((x,i)=>x.s.some(y=>y[0]===id)?`<a href="#" onclick="show('plan');setTimeout(()=>openDay(${i}),60);return false">${x.d}</a>`:'').filter(Boolean);
   const m=IMG[id];
-  return `<div class="card spot" id="spot-${id}">
+  return `<details class="card spot fold" id="spot-${id}"><summary><div class="srow">${m?`<img loading="lazy" src="${m.img}" alt="">`:'<span class="noimg">📍</span>'}
+   <div class="tx"><div class="nm2">${esc(s.n)}</div><div class="meta2">${s.hotel?'🏨 住宿':`<span class="stars" style="font-size:11px">${'★'.repeat(s.mine?5:s.b!=='free'?4:3)}</span>`}<span class="badge ${b[1]}" style="font-size:10px;padding:1px 7px">${b[0]}</span></div></div><span class="chev">▼</span></div></summary>
    ${m?`<div class="ph"><img loading="lazy" src="${m.img}" alt="${esc(s.n)}">${m.cap?`<span class="cp">${esc(m.cap)}</span>`:''}<a class="cr" target="_blank" href="${m.page}">Wikipedia</a></div>`:''}
-   <div class="top"><div><div class="nm">${esc(s.n)}</div><div class="it">${esc(s.it)}</div>${s.hotel?'':`<div class="stars">${'★'.repeat(s.mine?5:s.b!=='free'?4:3)}</div>`}</div><span class="badge ${b[1]}">${b[0]}</span></div>
+   <div class="it small">${esc(s.it)}</div>
    <div class="tags"><span class="tag" style="background:${C[s.c]};color:#fff">${CITY[s.c]}</span>${s.mine?'<span class="tag mine">🩷 我們想去</span>':''}${s.hotel?'<span class="tag">🏨 住宿</span>':''}${s.close?`<span class="tag">休：${esc(s.close)}</span>`:''}</div>
    <div>${s.d}</div>
    <dl class="kv">${s.price?`<dt>票價</dt><dd>${esc(s.price)}</dd>`:''}${s.hours?`<dt>時間</dt><dd>${esc(s.hours)}</dd>`:''}${days.length?`<dt>排在</dt><dd>${days.join('、')}</dd>`:''}</dl>
    <div class="btnrow"><a class="btn p" target="_blank" href="${gdir(s.ll)}">導航</a><a class="btn" target="_blank" href="${gmap(s.it+' '+(s.c==='tr'?'Italy':CITY[s.c]))}">Google 地圖</a>${s.url?`<a class="btn" target="_blank" href="${s.url}">官網／訂票</a>`:''}<a class="btn" href="#" onclick="show('map');focusSpot('${id}');return false">在地圖看</a></div>
-  </div>`;
+  </details>`;
 }
 function renderSpots(){
   const q=$('#q').value.trim().toLowerCase();
@@ -622,7 +647,7 @@ function initSpots(){
 }
 function openSpot(id){show('spots');spotFilter='all';$('#q').value='';
   document.querySelectorAll('#spotChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.k==='all'));renderSpots();
-  setTimeout(()=>{const el=document.getElementById('spot-'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid var(--brand)';setTimeout(()=>el.style.outline='',1800)}},80)}
+  setTimeout(()=>{const el=document.getElementById('spot-'+id);if(el){el.open=true;el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid var(--brand)';setTimeout(()=>el.style.outline='',1800)}},80)}
 function focusSpot(id){const s=S[id];drawCity(s.c==='tr'?'all':s.c);setTimeout(()=>{map.setView(s.ll,16);layer.eachLayer(m=>{if(m.getLatLng&&m.getLatLng().equals(L.latLng(s.ll)))m.openPopup()})},120)}
 
 /* ---------- booking ---------- */
