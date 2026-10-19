@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f5c4d">
+<title>大寶小寶義大利</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bg:#f6f3ee;--card:#fff;--ink:#1f2328;--sub:#5d646c;--line:#e4ded4;
+  --brand:#0f5c4d;--brand2:#e8f3ef;
+  --ve:#1f6fb2;--fi:#c0572b;--ro:#a8326e;--tr:#6b6f76;
+  --must:#c62828;--rec:#e08a00;--free:#2e7d32;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171a;--card:#1f2226;--ink:#eceff2;--sub:#a3abb4;--line:#30353b;
+  --brand:#5cc4a8;--brand2:#1d3330;--shadow:none;
+}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1f2226;--ink:#eceff2;--sub:#a3abb4;--line:#30353b;--brand:#5cc4a8;--brand2:#1d3330;--shadow:none}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;-webkit-text-size-adjust:100%}
+a{color:var(--brand)}
+header{background:var(--brand);color:#fff;padding:14px 16px 10px;padding-top:max(14px,env(safe-area-inset-top))}
+:root[data-theme="dark"] header{color:#10201c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header{color:#10201c}}
+header h1{margin:0;font-size:20px;letter-spacing:.5px}
+header .meta{font-size:13px;opacity:.9}
+#today{margin-top:8px;background:rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;font-size:14px;display:none}
+nav{position:sticky;top:0;z-index:1000;background:var(--card);border-bottom:1px solid var(--line);display:flex;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1 0 auto;border:0;background:none;color:var(--sub);font:inherit;font-size:14px;padding:11px 12px;border-bottom:3px solid transparent;white-space:nowrap}
+nav button.on{color:var(--brand);border-color:var(--brand);font-weight:600}
+main{max-width:760px;margin:0 auto;padding:12px 16px 80px}
+section{display:none}section.on{display:block}
+h2{font-size:18px;margin:18px 0 8px}h3{font-size:16px;margin:14px 0 6px}
+.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--line);padding:12px 14px;margin:10px 0}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+:root[data-theme="dark"] .chip.on{color:#10201c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.on{color:#10201c}}
+#map{height:58vh;min-height:320px;border-radius:14px;border:1px solid var(--line);z-index:1}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--sub);margin:6px 2px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.pin{width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.pin span{transform:rotate(45deg);color:#fff;font:700 12px/1 sans-serif}
+.pin.hotel{border-radius:6px;transform:none}.pin.hotel span{transform:none}
+.leaflet-popup-content{font:14px/1.45 -apple-system,"PingFang TC","Noto Sans TC",sans-serif;margin:10px 12px}
+.leaflet-popup-content b{font-size:15px}
+/* overview strip */
+.strip{display:flex;border-radius:12px;overflow:hidden;margin:8px 0;font-size:12px;color:#fff;text-align:center}
+.strip div{padding:8px 2px;line-height:1.3}
+.strip b{display:block;font-size:14px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:12px}
+.cal .h{color:var(--sub);text-align:center}
+.cal .d{border-radius:8px;padding:5px 2px;text-align:center;color:#fff;min-height:44px;cursor:pointer}
+.cal .d small{display:block;opacity:.9;font-size:10px;line-height:1.2}
+.cal .x{background:transparent}
+/* day timeline */
+.day{border-left:5px solid var(--c);}
+.day .dh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.day .dn{font-weight:700;color:var(--c);font-size:13px}
+.day .dt{font-weight:700;font-size:16px}
+.day .theme{color:var(--sub);font-size:13px;width:100%}
+.tl{list-style:none;margin:10px 0 4px;padding:0;position:relative}
+.tl:before{content:"";position:absolute;left:13px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl li{position:relative;padding:0 0 10px 36px}
+.tl li .n{position:absolute;left:2px;top:0;width:24px;height:24px;border-radius:50%;background:var(--c);color:#fff;font:700 12px/24px sans-serif;text-align:center}
+.tl li .n.t{background:var(--tr)}
+.tl li .tm{font-size:12px;color:var(--sub)}
+.tl li .w{font-weight:600}
+.tl li .note{font-size:13px;color:var(--sub)}
+.warn{background:#fff4e0;color:#7a4b00;border-radius:8px;padding:6px 9px;font-size:13px;margin-top:6px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .warn{background:#3a2c12;color:#ffd58a}}
+:root[data-theme="dark"] .warn{background:#3a2c12;color:#ffd58a}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-size:13px;text-decoration:none;color:var(--ink);background:var(--bg)}
+.btn.p{background:var(--brand);border-color:var(--brand);color:#fff}
+:root[data-theme="dark"] .btn.p{color:#10201c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.p{color:#10201c}}
+/* spots */
+.spot .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.spot .nm{font-weight:700;font-size:16px}
+.spot .it{font-size:12px;color:var(--sub)}
+.badge{flex:0 0 auto;font-size:12px;border-radius:999px;padding:3px 9px;color:#fff;font-weight:600}
+.b-must{background:var(--must)}.b-rec{background:var(--rec)}.b-free{background:var(--free)}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}
+.tag{font-size:11px;border-radius:6px;padding:2px 7px;background:var(--brand2);color:var(--brand)}
+.tag.mine{background:#fde7ef;color:#a8326e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.mine{background:#3b1f2b;color:#f59ac2}}
+:root[data-theme="dark"] .tag.mine{background:#3b1f2b;color:#f59ac2}
+.kv{display:grid;grid-template-columns:4.5em 1fr;gap:2px 8px;font-size:13px;margin-top:6px}
+.kv dt{color:var(--sub)}.kv dd{margin:0}
+details{border-top:1px dashed var(--line);margin-top:8px;padding-top:6px}
+summary{cursor:pointer;color:var(--brand);font-size:13px}
+#q{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:left;vertical-align:top}
+th{color:var(--sub);font-weight:600}
+.ck{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line)}
+.ck input{width:20px;height:20px;margin-top:2px;accent-color:var(--brand)}
+.ck.done .t{text-decoration:line-through;color:var(--sub)}
+.small{font-size:12px;color:var(--sub)}
+.hotel h3{margin:0 0 4px}
+.flight{display:flex;align-items:center;gap:8px;font-size:13px}
+.flight .ap{font-weight:700;font-size:16px}
+.flight .ln{flex:1;border-top:2px dashed var(--line);position:relative;text-align:center}
+.flight .ln span{position:relative;top:-10px;background:var(--card);padding:0 4px;color:var(--sub);font-size:11px}
+.fab{position:fixed;right:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:1100;background:var(--brand);color:#fff;border:0;border-radius:999px;padding:11px 15px;font:600 14px sans-serif;box-shadow:0 3px 12px rgba(0,0,0,.25)}
+:root[data-theme="dark"] .fab{color:#10201c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fab{color:#10201c}}
+.empty{color:var(--sub);text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🇮🇹 大寶小寶義大利 2027</h1>
+  <div class="meta">1/29（五）– 2/15（一）・威尼斯 4 晚 → 佛羅倫斯 5 晚 → 羅馬 7 晚</div>
+  <div id="today"></div>
+</header>
+<nav id="tabs">
+  <button data-t="map" class="on">🗺️ 地圖</button>
+  <button data-t="plan">📅 行程</button>
+  <button data-t="spots">📍 景點</button>
+  <button data-t="book">🎟️ 預約</button>
+  <button data-t="stay">🏨 住宿交通</button>
+  <button data-t="tips">💡 實用</button>
+</nav>
+<main>
+
+<section id="s-map" class="on">
+  <div class="strip">
+    <div style="flex:4;background:var(--ve)"><b>威尼斯</b>1/29–2/2</div>
+    <div style="flex:5;background:var(--fi)"><b>佛羅倫斯</b>2/2–2/7</div>
+    <div style="flex:7;background:var(--ro)"><b>羅馬</b>2/7–2/14</div>
+  </div>
+  <div class="chips" id="cityChips"></div>
+  <div class="chips" id="dayChips"></div>
+  <div id="map"></div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--ve)"></i>威尼斯</span>
+    <span><i class="dot" style="background:var(--fi)"></i>佛羅倫斯</span>
+    <span><i class="dot" style="background:var(--ro)"></i>羅馬</span>
+    <span>■ 方形＝飯店</span><span>數字＝當天順序</span>
+  </div>
+  <div id="mapDay"></div>
+</section>
+
+<section id="s-plan">
+  <h2>16 天一覽</h2>
+  <div class="card"><div class="cal" id="cal"></div>
+  <div class="small" style="margin-top:6px">點日期跳到那天。⚠ 2/6 農曆除夕、2/7 初一；2/4–2/10 台灣春節連假。</div></div>
+  <div id="days"></div>
+</section>
+
+<section id="s-spots">
+  <h2>景點資料庫</h2>
+  <input id="q" type="search" placeholder="🔎 搜尋：名稱、城市、要不要預約…">
+  <div class="chips" id="spotChips"></div>
+  <div class="small">🩷「我們想去」＝你們 Google 地圖／試算表裡標的；其他是我補的經典點。</div>
+  <div id="spotList"></div>
+</section>
+
+<section id="s-book">
+  <h2>預約總表</h2>
+  <div class="card small">打勾會存在這支手機上（只有你看得到）。票價、開放時間會變，<b>付款前以官網為準</b>。</div>
+  <div id="bookList"></div>
+</section>
+
+<section id="s-stay">
+  <h2>機票</h2>
+  <div class="card" id="flights"></div>
+  <h2>住宿</h2>
+  <div id="hotels"></div>
+  <h2>城際火車</h2>
+  <div class="card" id="trains"></div>
+</section>
+
+<section id="s-tips">
+  <h2>二月天氣</h2>
+  <div class="card" id="weather"></div>
+  <h2>要注意的日子</h2>
+  <div class="card" id="dates"></div>
+  <h2>防扒／防騙</h2>
+  <div class="card" id="scams"></div>
+  <h2>緊急與常用</h2>
+  <div class="card" id="emerg"></div>
+  <h2>行前打包</h2>
+  <div class="card" id="pack"></div>
+  <p class="small">資料來源：你們的 Google 試算表（88 討論 result、住宿、當地體驗心得、打包清單、想看的東西）、Google 我的地圖、三份訂房確認。訂房編號／PIN 刻意沒放上來（這是公開網頁），請看 email 或 App。</p>
+</section>
+</main>
+<button class="fab" id="fab">今天</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const C={ve:'#1f6fb2',fi:'#c0572b',ro:'#a8326e',tr:'#6b6f76'};
+const CITY={ve:'威尼斯',fi:'佛羅倫斯',ro:'羅馬',tr:'近郊'};
+const gmap=(q)=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+const gdir=(ll)=>'https://www.google.com/maps/dir/?api=1&destination='+ll[0]+','+ll[1];
+
+/* ---------- 景點 ---------- */
+// b: must=必須預約 rec=建議預約 free=免預約
+const S={
+ // 威尼斯
+ uvis:{n:'U-Visionary Venezia（飯店）',it:'Rio Terà Lista di Spagna 121',c:'ve',ll:[45.44183,12.32271],hotel:1,b:'free',d:'威尼斯住的飯店，走路 3 分鐘到 Santa Lucia 火車站，拖行李最省力。'},
+ vce:{n:'馬可波羅機場 VCE',it:'Aeroporto Marco Polo',c:'ve',ll:[45.5053,12.3519],b:'free',d:'到市區：ATVO／ACTV 巴士到 Piazzale Roma 約 25 分，再走 5 分鐘到飯店（最簡單）；或 Alilaguna 水上巴士橘線約 1 小時。'},
+ guglie:{n:'Cannaregio 運河／Guglie 橋',it:'Ponte delle Guglie',c:'ve',ll:[45.44357,12.32695],b:'free',d:'飯店旁邊的在地區域，晚餐、酒吧 bacaro（威尼斯小酒館 cicchetti）很多。嘉年華開幕水上遊行通常就在這條運河。'},
+ rialto:{n:'里亞托橋',it:'Ponte di Rialto',c:'ve',ll:[45.43803,12.33589],b:'free',d:'大運河最有名的石橋。清晨或晚上人少好拍。'},
+ mercato:{n:'里亞托市場',it:'Mercato di Rialto',c:'ve',ll:[45.43955,12.33404],b:'free',d:'魚市週二–週六早上；蔬果市場週一–週六。網友推 7:30 去最新鮮。週日公休。',close:'週日（魚市週日、一休）'},
+ sanmarco:{n:'聖馬可大教堂',it:'Basilica di San Marco',c:'ve',ll:[45.43452,12.33972],b:'rec',mine:0,d:'金色馬賽克拜占庭教堂。淡季也常排隊，官網買預約時段票可直接進；需遮肩膝、不能背大包包。',price:'基本門票約 €3–6＋預約費；黃金祭壇、博物館另計',hours:'週日／宗教節日上午只開放彌撒，觀光從下午開始',url:'https://www.basilicasanmarco.it/'},
+ campanile:{n:'聖馬可鐘樓',it:"Campanile di San Marco",c:'ve',ll:[45.43400,12.33889],b:'rec',d:'有電梯直上，俯瞰整個潟湖。天氣好才值得。',price:'約 €10–15'},
+ ducale:{n:'總督宮＋嘆息橋',it:'Palazzo Ducale',c:'ve',ll:[45.43369,12.34036],b:'rec',d:'威尼斯共和國權力中心，裡面可走過嘆息橋到監獄。建議官網預約；想看密道要另訂「Secret Itineraries」導覽。',price:'約 €25–30（官網）',url:'https://palazzoducale.visitmuve.it/'},
+ sospiri:{n:'嘆息橋（外觀）',it:'Ponte dei Sospiri',c:'ve',ll:[45.43413,12.34089],b:'free',d:'從 Ponte della Paglia 橋上拍外觀，免費。'},
+ bovolo:{n:'蝸牛階梯',it:'Scala Contarini del Bovolo',c:'ve',ll:[45.43486,12.33349],b:'rec',d:'藏在巷子裡的螺旋樓梯塔，上去可看屋頂。人數有限，可線上訂。',price:'約 €8–10'},
+ acqua:{n:'沉船書店',it:'Libreria Acqua Alta',c:'ve',ll:[45.43812,12.34277],b:'free',d:'書放在浴缸、貢多拉裡，後院有書本樓梯。現場排隊，空間小。'},
+ accbr:{n:'學院橋',it:"Ponte dell'Accademia",c:'ve',ll:[45.43154,12.32892],b:'free',d:'木橋上看大運河＋安康聖母教堂，明信片角度。'},
+ salute:{n:'安康聖母大殿',it:'Santa Maria della Salute',c:'ve',ll:[45.43078,12.33449],b:'free',d:'大運河口的白色圓頂教堂，主殿免費。'},
+ dogana:{n:'海關大樓岬角',it:'Punta della Dogana',c:'ve',ll:[45.43054,12.33589],b:'free',d:'岬角尖端看聖馬可＋潟湖夕陽。'},
+ burano:{n:'彩色島布拉諾',it:'Burano',c:'ve',ll:[45.48530,12.41670],b:'free',d:'彩色房子＋蕾絲。從 Fondamente Nove 搭 12 號水上巴士約 45 分鐘；回程可停玻璃島。建議買 ACTV 24/48/72 小時票。',url:'https://actv.avmspa.it/'},
+ murano:{n:'玻璃島穆拉諾',it:'Murano',c:'ve',ll:[45.45800,12.35300],b:'free',d:'玻璃工坊、示範吹玻璃（很多工坊示範免費或小額）。'},
+ gondola:{n:'貢多拉',it:'Gondola',c:'ve',ll:[45.43730,12.33420],b:'free',d:'官方統一價：白天約 €90／30 分、19:00 後約 €110（一船，不是一人）。上船前先確認價錢與時間。冬天記得帶毯子／暖暖包。'},
+ carnival:{n:'威尼斯嘉年華',it:'Carnevale di Venezia 2027',c:'ve',ll:[45.43420,12.33830],b:'free',d:'2027 年預計 1/30 – 2/9。你們 1/30–2/1 剛好碰上開幕週末：聖馬可廣場與街上的面具裝扮免費看；面具舞會才要買票。面具可在巷子小店買（挑手工的）。',url:'https://www.carnevale.venezia.it/'},
+ // 佛羅倫斯
+ spadai:{n:'Hotel Spadai（飯店）',it:"Via de' Martelli 10",c:'fi',ll:[43.77436,11.25572],hotel:1,b:'free',d:'佛羅倫斯住的飯店，就在大教堂旁邊。新聖母車站走路約 10 分鐘。'},
+ smn:{n:'新聖母車站',it:'Firenze Santa Maria Novella',c:'fi',ll:[43.77640,11.24800],b:'free',d:'佛羅倫斯主要火車站。'},
+ duomo:{n:'聖母百花大教堂＋圓頂',it:'Duomo / Cupola del Brunelleschi',c:'fi',ll:[43.77310,11.25600],b:'must',d:'教堂主殿免費（要排隊）。爬圓頂 463 階<b>必須預約時段</b>，買 Brunelleschi Pass（含圓頂、鐘樓、洗禮堂、博物館）。',price:'Brunelleschi Pass 約 €30',url:'https://duomo.firenze.it/en/'},
+ giotto:{n:'喬托鐘樓',it:'Campanile di Giotto',c:'fi',ll:[43.77290,11.25530],b:'rec',d:'414 階，可以拍到圓頂本身（爬圓頂就拍不到圓頂）。含在 Pass 內。'},
+ uffizi:{n:'烏菲茲美術館',it:'Galleria degli Uffizi',c:'fi',ll:[43.76780,11.25530],b:'rec',d:'波提切利《維納斯的誕生》《春》。淡季網友說可直接進，但預約早上 8:15 第一場最舒服。<b>週一休館</b>。2/7 是每月第一個週日免費 → 會爆滿，避開。',price:'冬季約 €12（11–2 月票價較低）＋預約費',hours:'週二–週日 8:15–18:30',close:'週一',url:'https://www.uffizi.it/en'},
+ signoria:{n:'領主廣場＋舊宮',it:'Piazza della Signoria / Palazzo Vecchio',c:'fi',ll:[43.76960,11.25580],b:'free',d:'露天雕塑博物館（傭兵涼廊免費）。舊宮塔樓要另買票。'},
+ pvecchio:{n:'老橋',it:'Ponte Vecchio',c:'fi',ll:[43.76800,11.25310],b:'free',d:'橋上都是金飾店。晚上燈亮很美。'},
+ accad:{n:'學院美術館（大衛像）',it:"Galleria dell'Accademia",c:'fi',ll:[43.77680,11.25860],b:'rec',d:'米開朗基羅《大衛》真品。<b>週一休館</b>。建議預約，淡季排隊短很多。',price:'約 €16＋預約費',close:'週一',url:'https://www.galleriaaccademiafirenze.it/'},
+ mcentrale:{n:'中央市場',it:'Mercato Centrale',c:'fi',ll:[43.77650,11.25350],b:'free',d:'一樓傳統市場（早上）、二樓美食街（開到晚上，週日也開）。牛肚包 lampredotto、牛排三明治。外面是皮件市集。'},
+ zaza:{n:'Trattoria Zà Zà',it:'Piazza del Mercato Centrale 26',c:'fi',ll:[43.77635,11.25445],b:'rec',mine:1,d:'你們地圖上標的餐廳。佛羅倫斯丁骨大牛排（bistecca alla fiorentina）名店，觀光客多，<b>晚餐建議先訂位</b>。'},
+ michel:{n:'米開朗基羅廣場',it:'Piazzale Michelangelo',c:'fi',ll:[43.76290,11.26500],b:'free',d:'看佛羅倫斯全景＋夕陽的地方。二月日落約 17:25，16:45 前到。'},
+ miniato:{n:'San Miniato 露台／聖米尼亞托教堂',it:'Terrazza San Miniato / San Miniato al Monte',c:'fi',ll:[43.76006,11.26418],b:'free',mine:1,d:'就在米開朗基羅廣場再往上走 5–10 分鐘的階梯（你 IG 看到的就是這裡）。人比廣場少、角度更高。教堂免費；修士傍晚約 17:30 有葛利果聖歌晚禱（時間以現場為準）。'},
+ pitti:{n:'碧提宮＋波波里花園',it:'Palazzo Pitti / Giardino di Boboli',c:'fi',ll:[43.76510,11.25000],b:'rec',d:'梅迪奇家族宮殿＋後花園，可配烏菲茲買聯票。週一休。',close:'週一'},
+ scroce:{n:'聖十字教堂',it:'Basilica di Santa Croce',c:'fi',ll:[43.76860,11.26220],b:'free',d:'米開朗基羅、伽利略、但丁紀念墓都在這。現場買票即可。',price:'約 €10'},
+ smnch:{n:'新聖母教堂＋古老藥局',it:'Santa Maria Novella / Officina Profumo',c:'fi',ll:[43.77460,11.24930],b:'free',d:'教堂門票現場買；旁邊的「新聖母藥局」是 1612 年的香水藥妝老店，免費參觀，買伴手禮。'},
+ siena:{n:'西恩納（一日遊）',it:'Siena – Piazza del Campo',c:'tr',ll:[43.31830,11.33170],b:'free',d:'從佛羅倫斯 Autostazione 搭 Autolinee Toscane 快速巴士約 1h15（直達市區，比火車方便）。扇形廣場、西恩納大教堂（地板鑲嵌）。網友：「冬天的西恩納超棒、人超少」。',close:'小鎮餐廳冬天部分休息'},
+ pisa:{n:'比薩斜塔（一日遊替代）',it:'Pisa – Torre pendente',c:'tr',ll:[43.72300,10.39660],b:'must',d:'火車約 1 小時。廣場免費；<b>登塔必須預約時段</b>。可順遊盧卡 Lucca 城牆。',price:'登塔約 €20',url:'https://www.opapisa.it/en/'},
+ // 羅馬
+ suite69:{n:'69 Suite Boutique（飯店）',it:'Via Nazionale 69',c:'ro',ll:[41.89928,12.49122],hotel:1,b:'free',d:'羅馬住的飯店，Monti 區，走路約 10 分鐘到 Termini 車站、15 分鐘到許願池。'},
+ termini:{n:'特米尼車站',it:'Roma Termini',c:'ro',ll:[41.90100,12.50160],b:'free',d:'羅馬主車站，往機場的 Leonardo Express 也在這。'},
+ colosseo:{n:'羅馬競技場',it:'Colosseo',c:'ro',ll:[41.89021,12.49223],b:'must',mine:1,d:'<b>必須預約實名時段票</b>（含古羅馬廣場＋帕拉丁丘，24 小時內有效）。票一開賣就搶，官網開放就買。網友：從人少的帕拉丁丘入口進去避開排隊。地下層／競技場地面要買 Full Experience。',price:'標準約 €18；Full Experience 約 €24',hours:'冬季約 8:30–16:30（最後入場更早）',url:'https://ticketing.colosseo.it/en/'},
+ foro:{n:'古羅馬廣場＋帕拉丁丘',it:'Foro Romano / Palatino',c:'ro',ll:[41.89250,12.48530],b:'must',d:'和競技場同一張票。帕拉丁丘上俯瞰廣場是最佳角度。'},
+ fori:{n:'帝國廣場大道',it:'Via dei Fori Imperiali',c:'ro',ll:[41.89276,12.48800],b:'free',mine:1,d:'競技場 → 威尼斯廣場的大道，兩邊都是遺跡，免費邊走邊看。'},
+ venezia:{n:'威尼斯廣場＋維克多・艾曼紐二世紀念堂',it:'Piazza Venezia / Vittoriano',c:'ro',ll:[41.89599,12.48246],b:'free',mine:1,d:'白色大理石「結婚蛋糕」。主體免費；頂樓玻璃電梯 Terrazza delle Quadrighe 要買票，360 度看羅馬。'},
+ marcello:{n:'馬切羅劇場',it:'Teatro di Marcello',c:'ro',ll:[41.89193,12.47991],b:'free',mine:1,d:'比競技場更早的古劇場，外觀免費看，旁邊是猶太區（炸朝鮮薊 carciofi alla giudia）。'},
+ bocca:{n:'真理之口',it:'Bocca della Verità（Santa Maria in Cosmedin）',c:'ro',ll:[41.88824,12.48144],b:'free',mine:1,d:'《羅馬假期》把手伸進去那個。現場排隊，不能預約；<b>新聞說已開始收 €2</b>。下午約 17:00–18:00 關，別太晚到。',price:'約 €2（2026 新制，現場再確認）'},
+ trevi:{n:'許願池',it:'Fontana di Trevi',c:'ro',ll:[41.90093,12.48331],b:'free',mine:1,d:'2026/2/2 起：靠近水池那一圈要買 <b>€2 票</b>（9:00–22:00，不是預約制，現場刷卡或線上買）；<b>站在廣場外圍看跟拍照都免費</b>——跟你們想的一樣，外圍拍就好。想沒人：早上 7–8 點或 22:00 後（那時也不用票）。',price:'池邊區 €2；外圍免費',url:'https://www.turismoroma.it/en/news/trevi-fountain-new-entry-fee-one-romes-symbols'},
+ pantheon:{n:'萬神殿',it:'Pantheon',c:'ro',ll:[41.89861,12.47687],b:'rec',mine:1,d:'2000 年前的混凝土圓頂，中間的圓洞直接看天空（下雨會落進來）。2023 起收費；現場買要排隊，週末建議線上先買。',price:'約 €5'},
+ ignazio:{n:'聖依納爵堂',it:"Chiesa di Sant'Ignazio di Loyola",c:'ro',ll:[41.89916,12.47971],b:'free',mine:1,d:'天花板是「假的圓頂」——平面畫出 3D 效果。地上有一面大鏡子，低頭從鏡子看最震撼。免費（鏡子旁投幣點燈）。離萬神殿 3 分鐘。'},
+ navona:{n:'納沃納廣場',it:'Piazza Navona',c:'ro',ll:[41.89920,12.47310],b:'free',d:'貝尼尼四河噴泉，傍晚街頭藝人多。'},
+ campo:{n:'鮮花廣場',it:"Campo de' Fiori",c:'ro',ll:[41.89560,12.47220],b:'free',d:'早上市集（週一–週六），晚上變酒吧區。'},
+ spagna:{n:'西班牙廣場＋階梯',it:'Piazza di Spagna / Scalinata',c:'ro',ll:[41.90599,12.48278],b:'free',mine:1,d:'階梯上禁止坐下（會被罰款）。旁邊是精品街 Via Condotti。'},
+ trinita:{n:'山上天主聖三教堂',it:'Trinità dei Monti',c:'ro',ll:[41.90624,12.48339],b:'free',mine:1,d:'西班牙階梯頂端的雙塔教堂，從上面往下看 Via Condotti 一直線。'},
+ plaza:{n:'Grand Hotel Plaza',it:'Via del Corso 126',c:'ro',ll:[41.90518,12.47879],b:'rec',mine:1,d:'你們地圖上有標。1860 年的老飯店，大廳＋酒吧很華麗，可以喝杯東西看看（建議先查酒吧營業時間）。'},
+ vatican:{n:'梵蒂岡博物館＋西斯汀禮拜堂',it:'Musei Vaticani',c:'ro',ll:[41.90649,12.45364],b:'must',mine:1,d:'<b>一定要官網預約</b>（門外兜售的「免排隊團」多是坑）。選開門第一場或下午 1 點後。<b>週日休館</b>（每月最後一個週日除外）、<b>2/11 固定休館</b>（拉特朗條約紀念日）。西斯汀禮拜堂禁止拍照。',price:'約 €20＋€5 線上預約費',hours:'週一–週六 8:00–18:00（最後入場 16:00）',close:'週日、2/11',url:'https://tickets.museivaticani.va/'},
+ speter:{n:'聖彼得大教堂＋圓頂',it:"Basilica di San Pietro",c:'ro',ll:[41.90220,12.45390],b:'free',d:'教堂免費（安檢排隊）。爬圓頂另付費。<b>週三上午教宗接見日，教堂上午不開</b>。從博物館西斯汀出口有時可直通教堂（看當天開放）。',price:'教堂免費；圓頂約 €10–17',url:'https://www.basilicasanpietro.va/'},
+ angelo:{n:'聖天使堡',it:"Castel Sant'Angelo",c:'ro',ll:[41.90310,12.46630],b:'rec',d:'頂樓看聖彼得大教堂夕陽；天使橋上的貝尼尼天使雕像免費看。'},
+ borghese:{n:'博爾蓋塞美術館',it:'Galleria Borghese',c:'ro',ll:[41.91420,12.49220],b:'must',d:'貝尼尼雕塑最精華（《阿波羅與達芙妮》）。<b>只能預約入場</b>，每場 2 小時、人數限制。<b>週一休館</b>。',price:'約 €15–22（含預約費）',close:'週一',url:'https://galleriaborghese.beniculturali.it/en/'},
+ pincio:{n:'平喬山露台＋人民廣場',it:'Terrazza del Pincio / Piazza del Popolo',c:'ro',ll:[41.91130,12.47900],b:'free',d:'羅馬看夕陽的經典露台，從博爾蓋塞公園散步過去。'},
+ traste:{n:'特拉斯提弗列區',it:'Trastevere',c:'ro',ll:[41.88940,12.47000],b:'free',d:'石板巷＋常春藤，晚餐首選區。Santa Maria in Trastevere 的金色馬賽克免費看。'},
+ gianicolo:{n:'賈尼科洛山',it:'Gianicolo',c:'ro',ll:[41.89190,12.46140],b:'free',d:'羅馬全景觀景台，中午 12 點有放禮炮。'},
+ smm:{n:'聖母大殿',it:'Santa Maria Maggiore',c:'ro',ll:[41.89760,12.49840],b:'free',d:'離飯店走路 7 分鐘，羅馬四大殿之一，免費。'},
+ monti:{n:'Monti 區',it:'Rione Monti',c:'ro',ll:[41.89500,12.49200],b:'free',d:'飯店所在區，古著店、小酒館、在地餐廳。'},
+ fco:{n:'羅馬機場 FCO',it:'Fiumicino T3',c:'ro',ll:[41.80030,12.23890],b:'free',d:'Termini 搭 Leonardo Express 約 32 分、約 €14，每 15–30 分一班。'},
+ tivoli:{n:'蒂沃利（一日遊選項）',it:"Tivoli – Villa d'Este",c:'tr',ll:[41.96290,12.79610],b:'rec',d:'文藝復興噴泉花園（世界遺產）。Termini／Tiburtina 搭火車約 1 小時。冬天噴泉照開但花園較蕭瑟。'}
+};
+
+/* ---------- 每日行程 ---------- */
+// s: [spotId, time, note]  t:1 = 交通
+const D=[
+ {d:'1/29',w:'五',c:'ve',t:'抵達威尼斯・暖身散步',s:[
+   ['vce','13:15','落地（EK135，以機票為準）'],
+   ['uvis','~15:00','入住，可提早寄放行李；有歡迎飲料券'],
+   ['guglie','傍晚','運河邊散步、找 bacaro 吃 cicchetti 當晚餐'],
+   ['rialto','晚上','夜景、人少']],
+  warn:'長途飛行第一天，排輕鬆。'},
+ {d:'1/30',w:'六',c:'ve',t:'里亞托 → 聖馬可・嘉年華開幕',s:[
+   ['mercato','08:00','早市'],['rialto','09:00',''],['bovolo','10:00',''],
+   ['sanmarco','11:00','預約時段'],['campanile','12:00','天晴才上'],
+   ['ducale','14:00','總督宮＋嘆息橋'],['sospiri','16:00','外觀拍照'],
+   ['carnival','傍晚','開幕活動（以官方節目表為準）']],
+  warn:'嘉年華開幕週末人多：聖馬可一帶早點去。'},
+ {d:'1/31',w:'日',c:'ve',t:'外島：彩色島＋玻璃島',s:[
+   ['burano','09:30','Fondamente Nove 搭 12 號船'],['murano','14:00','回程順路'],
+   ['acqua','16:30','沉船書店'],['carnival','晚上','街頭面具']],
+  warn:'市場週日休。水上巴士建議買 ACTV 天數票。'},
+ {d:'2/1',w:'一',c:'ve',t:'Dorsoduro・大運河南岸',s:[
+   ['accbr','09:30',''],['salute','10:15',''],['dogana','11:00',''],
+   ['gondola','15:00','貢多拉（白天比較便宜）'],['sanmarco','17:30','傍晚的聖馬可廣場人少（網友推）']],
+  warn:'明天要退房，晚上把行李整理好。'},
+ {d:'2/2',w:'二',c:'fi',t:'火車 → 佛羅倫斯',s:[
+   ['uvis','11:00','退房（可寄放行李）',1],['smn','13:05→15:20','火車（2h15）',1],
+   ['spadai','15:45','入住'],['duomo','17:00','先看大教堂外觀'],['signoria','18:00',''],['pvecchio','19:00','夜景']],
+  warn:'Santa Lucia 車站離威尼斯飯店 3 分鐘。'},
+ {d:'2/3',w:'三',c:'fi',t:'烏菲茲 → 過河看夕陽',s:[
+   ['uffizi','08:15','預約第一場'],['signoria','12:00',''],['pvecchio','13:00','過河到 Oltrarno 吃午餐'],
+   ['scroce','14:30',''],['michel','16:30','夕陽約 17:25'],['miniato','17:15','再往上爬到露台']]},
+ {d:'2/4',w:'四',c:'fi',t:'大教堂建築群・大衛像',s:[
+   ['duomo','08:30','爬圓頂（預約時段）'],['giotto','10:30','爬鐘樓'],['mcentrale','12:30','午餐'],
+   ['accad','14:00','大衛像'],['smnch','16:30','古老藥局買伴手禮'],['zaza','19:30','大牛排（先訂位）']]},
+ {d:'2/5',w:'五',c:'tr',t:'一日遊：西恩納（或比薩）',s:[
+   ['siena','08:30','巴士約 1h15'],['pisa','—','替代方案：比薩＋盧卡']],
+  warn:'二選一。西恩納比較符合你們「人少、在地」的口味；比薩登塔要預約。'},
+ {d:'2/6',w:'六',c:'fi',t:'碧提宮・Oltrarno・除夕',s:[
+   ['pitti','09:00','碧提宮＋波波里花園'],['pvecchio','13:00',''],['mcentrale','15:00','皮件市集'],['michel','17:00','沒看夠可再去一次']],
+  warn:'今天是農曆除夕 🧧'},
+ {d:'2/7',w:'日',c:'ro',t:'火車 → 羅馬・許願池夜景',s:[
+   ['smnch','09:30','早上逛逛（烏菲茲今天免費日＝爆滿，避開）'],
+   ['spadai','12:00','退房',1],['smn','13:43→15:25','火車（1h40）',1],
+   ['suite69','16:00','入住'],['trevi','20:00','晚上的許願池'],['spagna','21:00','']],
+  warn:'2/7 是每月第一個週日：國家博物館免費 → 人多。'},
+ {d:'2/8',w:'一',c:'ro',t:'古羅馬一日',s:[
+   ['colosseo','08:30','預約時段'],['foro','10:30','同一張票'],['fori','13:00','走大道'],
+   ['venezia','14:00','頂樓觀景電梯'],['marcello','15:30',''],['bocca','16:15','17:00 左右關門']],
+  warn:'週一很多美術館休館，剛好排戶外古蹟。'},
+ {d:'2/9',w:'二',c:'ro',t:'梵蒂岡',s:[
+   ['vatican','08:00','預約第一場'],['speter','12:30','聖彼得大教堂'],['angelo','16:00','頂樓看夕陽']],
+  warn:'為什麼排今天：週三教宗接見（教堂上午關）、2/11 博物館休館。今天也是嘉年華最後一天（Martedì Grasso）。'},
+ {d:'2/10',w:'三',c:'ro',t:'歷史中心步行',s:[
+   ['trevi','07:30','清晨沒人的許願池（不用票）'],['pantheon','09:00',''],['ignazio','10:00','看鏡子'],
+   ['navona','11:30',''],['campo','12:30','午餐'],['plaza','16:00','老飯店喝一杯'],['trinita','17:00',''],['spagna','17:30','']],
+  warn:'聖灰星期三（大齋期第一天），教堂會有彌撒，參觀時安靜一點。'},
+ {d:'2/11',w:'四',c:'ro',t:'博爾蓋塞＋公園夕陽',s:[
+   ['borghese','09:00','預約時段（2 小時）'],['pincio','12:00','散步過去'],['smm','15:30','飯店旁'],['monti','18:00','Monti 晚餐']],
+  warn:'梵蒂岡博物館今天休館。'},
+ {d:'2/12',w:'五',c:'tr',t:'彈性日：蒂沃利 或 羅馬補漏',s:[
+   ['tivoli','09:00','火車約 1 小時']],
+  warn:'累了就留在羅馬睡飽、補前幾天沒看夠的。'},
+ {d:'2/13',w:'六',c:'ro',t:'特拉斯提弗列・最後採買',s:[
+   ['campo','10:00','早市'],['traste','12:00','午餐＋散步'],['gianicolo','15:30','全景'],['traste','19:00','最後一晚大餐']]},
+ {d:'2/14',w:'日',c:'ro',t:'回家',s:[
+   ['suite69','11:00','退房，行李寄放飯店',1],['smm','11:30','附近散步／最後的 gelato'],
+   ['termini','17:15','Leonardo Express',1],['fco','17:50','T3 報到（EK096 20:50）',1]],
+  warn:'2/15（一）20:40 抵桃園。退稅單要在 FCO 辦。'}
+];
+
+/* ---------- 共用 ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const BADGE={must:['必須預約','b-must'],rec:['建議預約','b-rec'],free:['免預約','b-free']};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const year=2027;
+const dateOf=s=>{const[m,d]=s.split('/').map(Number);return new Date(year,m-1,d)};
+
+/* tabs */
+function show(t){
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  document.querySelectorAll('main section').forEach(s=>s.classList.toggle('on',s.id==='s-'+t));
+  if(t==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
+  window.scrollTo(0,0);store.set('tab',t);
+}
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)};
+
+/* ---------- map ---------- */
+let map,layer;
+function pin(color,label,hotel){
+  return L.divIcon({className:'',iconSize:[28,28],iconAnchor:hotel?[14,14]:[14,28],popupAnchor:[0,-24],
+    html:`<div class="pin${hotel?' hotel':''}" style="background:${color}"><span>${label}</span></div>`});
+}
+function popup(id,extra){
+  const s=S[id];const b=BADGE[s.b];
+  return `<b>${esc(s.n)}</b><br><span class="small">${esc(s.it)}</span><br>`+
+   (extra?`<div style="margin:4px 0">${extra}</div>`:'')+
+   `<span class="badge ${b[1]}" style="font-size:11px">${b[0]}</span>
+   <div class="btnrow"><a class="btn p" target="_blank" href="${gdir(s.ll)}">導航</a>
+   <a class="btn" href="#" onclick="openSpot('${id}');return false">看介紹</a></div>`;
+}
+const VIEWS={
+ all:{b:[[45.6,10.2],[41.75,12.9]]},
+ ve:{b:[[45.49,12.31],[45.428,12.42]]},
+ fi:{b:[[43.778,11.247],[43.759,11.266]]},
+ ro:{b:[[41.915,12.452],[41.886,12.505]]}
+};
+function initMap(){
+  map=L.map('map',{zoomControl:true,tap:true});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+    maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
+  layer=L.layerGroup().addTo(map);
+  const cc=$('#cityChips');
+  [['all','🇮🇹 全程'],['ve','威尼斯'],['fi','佛羅倫斯'],['ro','羅馬']].forEach(([k,l])=>{
+    const b=document.createElement('button');b.className='chip';b.textContent=l;b.dataset.k=k;
+    b.onclick=()=>drawCity(k);cc.appendChild(b);
+  });
+  const dc=$('#dayChips');
+  D.forEach((x,i)=>{const b=document.createElement('button');b.className='chip';b.dataset.i=i;
+    b.innerHTML=`<i class="dot" style="background:${C[x.c]}"></i>${x.d}（${x.w}）`;b.onclick=()=>drawDay(i);dc.appendChild(b)});
+}
+function setChips(city,day){
+  document.querySelectorAll('#cityChips .chip').forEach(b=>b.classList.toggle('on',b.dataset.k===city));
+  document.querySelectorAll('#dayChips .chip').forEach(b=>b.classList.toggle('on',+b.dataset.i===day));
+}
+function drawCity(k){
+  layer.clearLayers();setChips(k,-1);$('#mapDay').innerHTML='';
+  if(k==='all'){
+    const pts=[['uvis','威尼斯 1/29–2/2'],['spadai','佛羅倫斯 2/2–2/7'],['suite69','羅馬 2/7–2/14']];
+    L.polyline(pts.map(p=>S[p[0]].ll),{color:'#555',weight:3,dashArray:'6 6'}).addTo(layer);
+    pts.forEach(([id,l],i)=>L.marker(S[id].ll,{icon:pin(C[S[id].c],i+1,1)}).bindPopup(popup(id,l)).addTo(layer));
+    ['siena','pisa','tivoli'].forEach(id=>L.marker(S[id].ll,{icon:pin(C.tr,'★')}).bindPopup(popup(id,'一日遊選項')).addTo(layer));
+    L.marker(S.vce.ll,{icon:pin('#333','✈')}).bindPopup(popup('vce','1/29 抵達')).addTo(layer);
+    L.marker(S.fco.ll,{icon:pin('#333','✈')}).bindPopup(popup('fco','2/14 離開')).addTo(layer);
+    $('#mapDay').innerHTML=`<div class="card small">🚄 威尼斯 →（2h15）→ 佛羅倫斯 →（1h40）→ 羅馬。點城市看該城所有景點，點日期看當天路線。</div>`;
+  }else{
+    Object.entries(S).filter(([,s])=>s.c===k).forEach(([id,s])=>{
+      L.marker(s.ll,{icon:pin(C[k],s.hotel?'H':(s.mine?'♥':'•'),s.hotel)}).bindPopup(popup(id)).addTo(layer);
+    });
+  }
+  map.fitBounds(VIEWS[k].b,{padding:[10,10]});store.set('map',{k});
+}
+function drawDay(i){
+  layer.clearLayers();setChips('',i);
+  const day=D[i];const color=C[day.c];
+  const seen=[];const ids=[];
+  day.s.forEach(([id])=>{if(!ids.includes(id))ids.push(id)});
+  const route=day.s.map(x=>S[x[0]].ll);
+  if(route.length>1&&day.c!=='tr')L.polyline(route,{color,weight:4,opacity:.75}).addTo(layer);
+  day.s.forEach(([id,tm,note],j)=>{
+    const s=S[id];
+    L.marker(s.ll,{icon:pin(color,j+1,s.hotel),zIndexOffset:1000-j}).bindPopup(popup(id,`<b>${esc(tm)}</b> ${esc(note||'')}`)).addTo(layer);
+  });
+  map.fitBounds(L.latLngBounds(route).pad(0.15),{maxZoom:16});
+  $('#mapDay').innerHTML=dayCard(i,true);
+  store.set('map',{i});
+}
+
+/* ---------- plan ---------- */
+function dayCard(i,compact){
+  const x=D[i];const col=C[x.c];
+  const items=x.s.map(([id,tm,note,tr],j)=>`<li><span class="n${tr?' t':''}">${tr?'🚆':j+1}</span>
+    <div class="tm">${esc(tm)}</div><div class="w"><a href="#" onclick="openSpot('${id}');return false" style="color:inherit;text-decoration:none">${esc(S[id].n)}</a>
+    ${S[id].b!=='free'?`<span class="badge ${BADGE[S[id].b][1]}" style="font-size:10px;padding:1px 6px">${BADGE[S[id].b][0]}</span>`:''}</div>
+    ${note?`<div class="note">${esc(note)}</div>`:''}</li>`).join('');
+  const gm='https://www.google.com/maps/dir/'+x.s.map(([id])=>S[id].ll.join(',')).join('/');
+  return `<div class="card day" id="day${i}" style="--c:${col}">
+    <div class="dh"><span class="dn">DAY ${i+1}・${CITY[x.c]}</span><span class="dt">${x.d}（${x.w}）</span><span class="theme">${esc(x.t)}</span></div>
+    <ul class="tl">${items}</ul>
+    ${x.warn?`<div class="warn">⚠ ${esc(x.warn)}</div>`:''}
+    <div class="btnrow">${compact?'':`<a class="btn p" href="#" onclick="show('map');drawDay(${i});return false">🗺️ 看路線</a>`}
+    <a class="btn" target="_blank" href="${gm}">Google 地圖整天路線</a></div></div>`;
+}
+function renderPlan(){
+  const cal=$('#cal');
+  cal.innerHTML='日一二三四五六'.split('').map(w=>`<div class="h">${w}</div>`).join('');
+  const first=dateOf('1/29').getDay();
+  for(let k=0;k<first;k++)cal.innerHTML+='<div class="d x"></div>';
+  D.forEach((x,i)=>{cal.innerHTML+=`<div class="d" style="background:${C[x.c]}" onclick="document.getElementById('day${i}').scrollIntoView({behavior:'smooth'})">${x.d}<small>${esc(x.t.split(/[・：→]/)[0].slice(0,6))}</small></div>`});
+  cal.innerHTML+=`<div class="d" style="background:#333">2/15<small>抵台 20:40</small></div>`;
+  $('#days').innerHTML=D.map((x,i)=>dayCard(i)).join('');
+}
+
+/* ---------- spots ---------- */
+let spotFilter='all';
+function spotCard(id){
+  const s=S[id];const b=BADGE[s.b];
+  const days=D.map((x,i)=>x.s.some(y=>y[0]===id)?`<a href="#" onclick="show('plan');setTimeout(()=>document.getElementById('day${i}').scrollIntoView(),60);return false">${x.d}</a>`:'').filter(Boolean);
+  return `<div class="card spot" id="spot-${id}">
+   <div class="top"><div><div class="nm">${esc(s.n)}</div><div class="it">${esc(s.it)}</div></div><span class="badge ${b[1]}">${b[0]}</span></div>
+   <div class="tags"><span class="tag" style="background:${C[s.c]};color:#fff">${CITY[s.c]}</span>${s.mine?'<span class="tag mine">🩷 我們想去</span>':''}${s.hotel?'<span class="tag">🏨 住宿</span>':''}${s.close?`<span class="tag">休：${esc(s.close)}</span>`:''}</div>
+   <div>${s.d}</div>
+   <dl class="kv">${s.price?`<dt>票價</dt><dd>${esc(s.price)}</dd>`:''}${s.hours?`<dt>時間</dt><dd>${esc(s.hours)}</dd>`:''}${days.length?`<dt>排在</dt><dd>${days.join('、')}</dd>`:''}</dl>
+   <div class="btnrow"><a class="btn p" target="_blank" href="${gdir(s.ll)}">導航</a><a class="btn" target="_blank" href="${gmap(s.it+' '+(s.c==='tr'?'Italy':CITY[s.c]))}">Google 地圖</a>${s.url?`<a class="btn" target="_blank" href="${s.url}">官網／訂票</a>`:''}<a class="btn" href="#" onclick="show('map');focusSpot('${id}');return false">在地圖看</a></div>
+  </div>`;
+}
+function renderSpots(){
+  const q=$('#q').value.trim().toLowerCase();
+  const list=Object.keys(S).filter(id=>{
+    const s=S[id];
+    if(spotFilter==='mine'&&!s.mine)return false;
+    if(spotFilter==='must'&&s.b==='free')return false;
+    if(['ve','fi','ro','tr'].includes(spotFilter)&&s.c!==spotFilter)return false;
+    if(!q)return true;
+    return (s.n+s.it+s.d+CITY[s.c]+BADGE[s.b][0]+(s.price||'')+(s.close||'')).toLowerCase().includes(q);
+  });
+  $('#spotList').innerHTML=list.length?list.map(spotCard).join(''):'<div class="empty">找不到，換個關鍵字</div>';
+}
+function initSpots(){
+  const sc=$('#spotChips');
+  [['all','全部'],['mine','🩷 我們想去'],['must','🎟️ 要預約'],['ve','威尼斯'],['fi','佛羅倫斯'],['ro','羅馬'],['tr','一日遊']].forEach(([k,l])=>{
+    const b=document.createElement('button');b.className='chip'+(k==='all'?' on':'');b.textContent=l;b.dataset.k=k;
+    b.onclick=()=>{spotFilter=k;sc.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));renderSpots()};sc.appendChild(b);
+  });
+  $('#q').oninput=renderSpots;renderSpots();
+}
+function openSpot(id){show('spots');spotFilter='all';$('#q').value='';
+  document.querySelectorAll('#spotChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.k==='all'));renderSpots();
+  setTimeout(()=>{const el=document.getElementById('spot-'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid var(--brand)';setTimeout(()=>el.style.outline='',1800)}},80)}
+function focusSpot(id){const s=S[id];drawCity(s.c==='tr'?'all':s.c);setTimeout(()=>{map.setView(s.ll,16);layer.eachLayer(m=>{if(m.getLatLng&&m.getLatLng().equals(L.latLng(s.ll)))m.openPopup()})},120)}
+
+/* ---------- booking ---------- */
+const BOOK=[
+ {g:'⚡ 越早越好（會賣完）',items:[
+  ['colosseo','羅馬競技場（2/8 早上）','官方票通常約 1 個月前開賣，開賣就買；實名制，要填護照姓名'],
+  ['vatican','梵蒂岡博物館（2/9 早上第一場）','官網約 60 天前開放'],
+  ['borghese','博爾蓋塞美術館（2/11 09:00）','只能預約，場次少'],
+  ['duomo','佛羅倫斯圓頂（2/4 早上）','買 Brunelleschi Pass 時就要選圓頂時段']]},
+ {g:'👍 建議先訂',items:[
+  ['uffizi','烏菲茲（2/3 08:15）','淡季也可現場，但預約最省時間'],
+  ['accad','學院美術館大衛像（2/4 下午）',''],
+  ['sanmarco','聖馬可大教堂（1/30）','嘉年華開幕日人多'],
+  ['ducale','總督宮（1/30 下午）',''],
+  ['zaza','Trattoria Zà Zà 晚餐（2/4）','打電話或網站訂位'],
+  ['pantheon','萬神殿（2/10）','可現場，週末建議線上'],
+  ['pitti','碧提宮＋波波里（2/6）',''],
+  ['siena','2/5 一日遊決定：西恩納 or 比薩','比薩登塔要預約']]},
+ {g:'🚆 交通',items:[
+  ['smn','威尼斯 → 佛羅倫斯 2/2 13:05','Trenitalia／Italo，早買便宜'],
+  ['termini','佛羅倫斯 → 羅馬 2/7 13:43',''],
+  ['burano','威尼斯 ACTV 水上巴士天數票','到了再買也行'],
+  ['fco','Leonardo Express 2/14','當天買即可']]},
+ {g:'🏨 住宿要做的事',items:[
+  ['uvis','威尼斯：免費取消期限 1/27','到期前 48 小時；住宿費在飯店付'],
+  ['suite69','羅馬：免費取消期限 2/2','入住 5 天前'],
+  ['spadai','佛羅倫斯：已付款、不可取消','城市稅現場付']]}
+];
+function renderBook(){
+  const done=store.get('book',{});
+  $('#bookList').innerHTML=BOOK.map((g,gi)=>`<h3>${g.g}</h3><div class="card">`+g.items.map(([id,t,n],k)=>{
+    const key=gi+'-'+k;const s=S[id];const b=BADGE[s.b];
+    return `<label class="ck${done[key]?' done':''}"><input type="checkbox" data-k="${key}"${done[key]?' checked':''}>
+     <div style="flex:1"><div class="t"><b>${esc(t)}</b> <span class="badge ${b[1]}" style="font-size:10px;padding:1px 6px">${b[0]}</span></div>
+     ${n?`<div class="small">${esc(n)}</div>`:''}
+     <div class="small">${s.price?esc(s.price)+'　':''}${s.url?`<a target="_blank" href="${s.url}">官網</a>　`:''}<a href="#" onclick="openSpot('${id}');return false">介紹</a></div></div></label>`}).join('')+'</div>').join('')+
+   `<h3>📌 各地「休館日」速查</h3><div class="card"><table><tr><th>地點</th><th>休</th><th>影響</th></tr>
+   <tr><td>烏菲茲、學院、碧提</td><td>週一</td><td>佛羅倫斯沒有週一，OK</td></tr>
+   <tr><td>博爾蓋塞</td><td>週一</td><td>排 2/11（四）</td></tr>
+   <tr><td>梵蒂岡博物館</td><td>週日、2/11</td><td>排 2/9（二）</td></tr>
+   <tr><td>聖彼得大教堂</td><td>週三上午</td><td>排 2/9</td></tr>
+   <tr><td>里亞托魚市</td><td>週日、週一</td><td>排 1/30（六）</td></tr></table></div>`;
+  $('#bookList').onchange=e=>{const k=e.target.dataset.k;if(!k)return;const d=store.get('book',{});d[k]=e.target.checked;store.set('book',d);e.target.closest('.ck').classList.toggle('done',e.target.checked)};
+}
+
+/* ---------- stay ---------- */
+function renderStay(){
+  $('#flights').innerHTML=`
+   <div class="small">依試算表「88 討論 result」的威尼斯進／羅馬出（阿聯酋）。航班號、時間<b>以實際機票為準</b>。</div>
+   <h3>去程 1/29（五）</h3>
+   <div class="flight"><span class="ap">TPE</span><span class="ln"><span>00:20 EK387</span></span><span class="ap">DXB</span><span class="ln"><span>09:35 EK135</span></span><span class="ap">VCE</span></div>
+   <div class="small">1/28（四）深夜到桃園 T2；杜拜轉機約 3h20，行李直掛；13:15 抵威尼斯</div>
+   <h3>回程 2/14（日）</h3>
+   <div class="flight"><span class="ap">FCO</span><span class="ln"><span>20:50 EK096</span></span><span class="ap">DXB</span><span class="ln"><span>08:45 EK386</span></span><span class="ap">TPE</span></div>
+   <div class="small">FCO T3；杜拜轉機約 3h15；2/15（一）20:40 抵桃園。行李：去程 25kg、回程 30kg</div>`;
+  const H=[
+   {id:'uvis',city:'ve',name:'U-Visionary Venezia',date:'1/29（五）→ 2/2（二）・4 晚',addr:'Rio Terà Lista di Spagna 121, Venezia',tel:'+39 041 969 1868',ci:'14:00 後（可要求免費提早入住）',co:'11:00',meal:'含早餐',pay:'住宿費在飯店付（€824.40）＋城市稅 €4.5／人／晚',cancel:'1/27 前免費取消',perk:'VIP：歡迎 minibar、花園歡迎飲料、€50 升等券（現場詢問）',web:'https://www.uvisionaryvenezia.com'},
+   {id:'spadai',city:'fi',name:'Hotel Spadai',date:'2/2（二）→ 2/7（日）・5 晚',addr:"Via de' Martelli 10, Firenze",tel:'+39 055 627 0800',ci:'14:00 後',co:'12:00',meal:'不含早餐',pay:'已付款（易遊網）；城市稅現場付，約 NT$2,595',cancel:'不可取消',perk:'櫃檯 24 小時'},
+   {id:'suite69',city:'ro',name:'69 Suite Boutique',date:'2/7（日）→ 2/14（日）・7 晚',addr:'Via Nazionale 69, Roma（Monti）',tel:'+39 06 9896 8169',ci:'14:00–24:00',co:'11:00',meal:'不含早餐',pay:'在住宿付 €1,203.18（含城市稅；Booking.com 折抵已扣）',cancel:'2/2 前免費取消',perk:'高級特大雙人床套房、浴缸、免治馬桶、咖啡機'}
+  ];
+  $('#hotels').innerHTML=H.map(h=>`<div class="card hotel" style="border-left:5px solid ${C[h.city]}">
+   <h3>${h.name}</h3><div class="small">${h.date}</div>
+   <dl class="kv"><dt>地址</dt><dd>${h.addr}</dd><dt>入住</dt><dd>${h.ci}</dd><dt>退房</dt><dd>${h.co}</dd><dt>餐</dt><dd>${h.meal}</dd><dt>付款</dt><dd>${h.pay}</dd><dt>取消</dt><dd>${h.cancel}</dd><dt>備註</dt><dd>${h.perk}</dd></dl>
+   <div class="btnrow"><a class="btn p" target="_blank" href="${gdir(S[h.id].ll)}">導航</a><a class="btn" href="tel:${h.tel.replace(/\s/g,'')}">📞 ${h.tel}</a>${h.web?`<a class="btn" target="_blank" href="${h.web}">官網</a>`:''}</div>
+   <div class="small" style="margin-top:6px">訂房編號／PIN：見 email 或 App（不放在公開網頁）</div></div>`).join('');
+  $('#trains').innerHTML=`<table><tr><th>日期</th><th>路線</th><th>時間</th></tr>
+   <tr><td>2/2（二）</td><td>Venezia S. Lucia → Firenze SMN</td><td>13:05 → 15:20</td></tr>
+   <tr><td>2/7（日）</td><td>Firenze SMN → Roma Termini</td><td>13:43 → 15:25</td></tr>
+   <tr><td>2/14（日）</td><td>Termini → FCO（Leonardo Express）</td><td>約 32 分・€14</td></tr></table>
+   <div class="btnrow"><a class="btn" target="_blank" href="https://www.trenitalia.com">Trenitalia</a><a class="btn" target="_blank" href="https://www.italotreno.com">Italo</a><a class="btn" target="_blank" href="https://actv.avmspa.it/">威尼斯 ACTV</a></div>
+   <div class="small" style="margin-top:6px">紙本／PDF 車票上車前不用打票；舊式「Regionale」區間車票要先在月台機器打票。</div>`;
+}
+
+/* ---------- tips ---------- */
+function renderTips(){
+  $('#weather').innerHTML=`<table><tr><th>城市</th><th>白天</th><th>人潮</th><th>重點</th></tr>
+   <tr><td style="color:${C.ve}"><b>威尼斯</b></td><td>1–9°C</td><td>嘉年華多</td><td>最冷、潮濕，圍巾擋風；偶有 acqua alta 淹水（2 月風險較低）</td></tr>
+   <tr><td style="color:${C.fi}"><b>佛羅倫斯</b></td><td>3–12°C</td><td>少</td><td>美術館人少是最大優點</td></tr>
+   <tr><td style="color:${C.ro}"><b>羅馬</b></td><td>3–14°C</td><td>中</td><td>曬太陽暖、陰影冷，洋蔥式穿搭</td></tr></table>
+   <div class="warn">☀ 日落約 17:20–17:35，下午 5 點多天黑 → 戶外景點排早上。</div>`;
+  $('#dates').innerHTML=`<table>
+   <tr><td><b>1/30–2/9</b></td><td>威尼斯嘉年華（最後兩個週末最擠）</td></tr>
+   <tr><td><b>2/6–2/7</b></td><td>農曆除夕／初一</td></tr>
+   <tr><td><b>2/7（日）</b></td><td>每月第一個週日：國家博物館免費 → 人超多</td></tr>
+   <tr><td><b>2/9（二）</b></td><td>嘉年華最後一天 Martedì Grasso</td></tr>
+   <tr><td><b>2/10（三）</b></td><td>聖灰星期三；教宗週三接見 → 聖彼得上午不開</td></tr>
+   <tr><td><b>2/11（四）</b></td><td>梵蒂岡博物館休館</td></tr></table>
+   <div class="small" style="margin-top:6px">威尼斯「入城費」2027 年從 3 月底才開始收，且住宿旅客免收，這趟不用管。</div>`;
+  $('#scams').innerHTML=`<ul style="margin:0;padding-left:18px">
+   <li>羅馬 <b>64 號公車</b>＝扒手快線（Termini ⇄ 梵蒂岡），人擠就顧好包包</li>
+   <li>陌生人硬塞<b>友誼手環</b>、玫瑰 → 不要伸手接，直接走</li>
+   <li>假警察查護照、假募款連署、打電話來說是飯店／銀行要卡號 → 一律拒絕</li>
+   <li>計程車只搭白色官方車，上車看跳表</li>
+   <li>景點旁餐廳又貴又普通，走遠一兩條街；看菜單有沒有 coperto（座位費）</li>
+   <li>梵蒂岡、競技場門口的「免排隊團」大多是坑，用官網</li>
+   <li>西班牙階梯不能坐、噴泉不能泡腳，會被罰款</li></ul>`;
+  $('#emerg').innerHTML=`<dl class="kv" style="grid-template-columns:7em 1fr">
+   <dt>緊急電話</dt><dd><a href="tel:112">112</a>（警察／消防／救護）</dd>
+   <dt>駐義大利代表處</dt><dd>羅馬・<a target="_blank" href="https://www.roc-taiwan.org/it/">官網</a>（急難救助電話見官網）</dd>
+   <dt>外交部急難救助</dt><dd><a href="tel:+886800085095">+886-800-085-095</a></dd>
+   <dt>Booking 客服</dt><dd>國外 <a href="tel:+85230775532">+852 3077 5532</a></dd>
+   <dt>插座</dt><dd>Type L／F／C，230V</dd>
+   <dt>小費</dt><dd>不強制；帳單有 servizio 就不用再給</dd>
+   <dt>飲水</dt><dd>羅馬路邊 nasoni 免費飲水，帶水壺</dd></dl>`;
+  const PACK=[['證件・財務',['護照（效期 6 個月以上）','ETIAS／簽證規定確認','機票＋訂房確認截圖離線','旅平險＋不便險','信用卡 2 張分開放','少量歐元零錢']],
+   ['保暖',['發熱衣','毛衣／刷毛 2–3 件','長大衣（噴防水）','圍巾','毛帽＋手套','保暖褲']],
+   ['雨具・鞋',['摺疊傘','輕便防水外套','防潑水噴霧','防水好走的鞋','備用鞋','厚襪']],
+   ['3C・其他',['萬用轉接頭','行動電源（隨身）','eSIM／網卡','常備藥','護唇膏＋乳液','暖暖包','防盜斜背包＋手機掛繩','環保水壺＋購物袋','Google Maps 離線地圖']]];
+  const done=store.get('pack',{});
+  $('#pack').innerHTML=PACK.map(([g,a],gi)=>`<h3>${g}</h3>`+a.map((t,k)=>{const key=gi+'-'+k;return `<label class="ck${done[key]?' done':''}"><input type="checkbox" data-k="${key}"${done[key]?' checked':''}><span class="t">${t}</span></label>`}).join('')).join('');
+  $('#pack').onchange=e=>{const k=e.target.dataset.k;if(!k)return;const d=store.get('pack',{});d[k]=e.target.checked;store.set('pack',d);e.target.closest('.ck').classList.toggle('done',e.target.checked)};
+}
+
+/* ---------- today ---------- */
+function todayIndex(){
+  const now=new Date();const t=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  return D.findIndex(x=>dateOf(x.d).getTime()===t.getTime());
+}
+function initToday(){
+  const i=todayIndex();const el=$('#today');
+  const start=dateOf('1/29');const now=new Date();
+  if(i>=0){el.style.display='block';el.innerHTML=`📍 今天 DAY ${i+1}：${esc(D[i].t)}`;el.onclick=()=>{show('plan');document.getElementById('day'+i).scrollIntoView()}}
+  else if(now<start){const n=Math.ceil((start-now)/864e5);el.style.display='block';el.textContent=`✈️ 還有 ${n} 天出發`}
+  $('#fab').onclick=()=>{const k=todayIndex();if(k>=0){show('map');drawDay(k)}else{show('plan')}};
+}
+
+initMap();renderPlan();initSpots();renderBook();renderStay();renderTips();initToday();
+const ti=todayIndex();
+if(ti>=0)drawDay(ti);else{const m=store.get('map',{k:'all'});if(m.i!=null&&D[m.i])drawDay(m.i);else drawCity(m.k||'all')}
+const lastTab=store.get('tab','map');if(lastTab!=='map')show(lastTab);
+</script>
+</body>
+</html>
